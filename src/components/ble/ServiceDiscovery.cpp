@@ -1,0 +1,33 @@
+#include "ServiceDiscovery.h"
+#include <libraries/log/nrf_log.h>
+#include "BleClient.h"
+
+using namespace Watch::Controllers;
+
+ServiceDiscovery::ServiceDiscovery(std::array<BleClient*, 1>&& clients) : clients{clients} {
+
+}
+
+void ServiceDiscovery::StartDiscovery(uint16_t connectionHandle) {
+  NRF_LOG_INFO("[Discovery] Starting discovery");
+  clientIterator = clients.begin();
+  DiscoverNextService(connectionHandle);
+}
+
+void ServiceDiscovery::OnServiceDiscovered(uint16_t connectionHandle) {
+  clientIterator++;
+  if(clientIterator != clients.end()) {
+    DiscoverNextService(connectionHandle);
+  } else {
+    NRF_LOG_INFO("End of service discovery");
+  }
+}
+
+void ServiceDiscovery::DiscoverNextService(uint16_t connectionHandle) {
+  NRF_LOG_INFO("[Discovery] Discover next service");
+
+  auto discoverNextService = [this](uint16_t connectionHandle){
+    this->OnServiceDiscovered(connectionHandle);
+  };
+  (*clientIterator)->Discover(connectionHandle, discoverNextService);
+}

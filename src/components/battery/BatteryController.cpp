@@ -57,7 +57,7 @@ void Battery::Update() {
       count++;
   }else{
       count=0;
-      percentRemaining=sum/20.0f;// gia trị trung bình
+      percentRemaining=sum/20.0f;
       sum=0;
   }  
 }

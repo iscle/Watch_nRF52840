@@ -11,4 +11,17 @@ add openocd :
 
 http://openocd.org/
 
+BUILD :
+
+mkdir build
+
+cd build
+
+cmake ../
+
+make all
+
+
+ 
+
 

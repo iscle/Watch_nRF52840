@@ -1,0 +1,11 @@
+
+erase
+r 
+g
+loadbin bootloader.bin 0x0000000
+r
+g
+loadbin appimage.bin 0x00008000
+r
+g
+q

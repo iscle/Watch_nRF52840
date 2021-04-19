@@ -219,7 +219,6 @@ Clock::Clock(DisplayApp* app,
           lv_obj_set_hidden(labletopCircle,true);
           lv_obj_set_hidden(lablerightCircle,true);
 
-
           labelpoint  = lv_img_create(lv_scr_act(), NULL);
           lv_img_set_src(labelpoint, &pointtest);
           lv_obj_align(labelpoint, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0); 
@@ -366,7 +365,6 @@ Clock::Clock(DisplayApp* app,
 
         case Modes::Oxi:
           heartRateSensor.SpO2Init();  
-          spO2=98+rand() % (1 - 0 + 1) + 0;
           imgpair = lv_img_create(lv_scr_act(), nullptr);  
           lv_img_set_src(imgpair, &oxi);
           lv_obj_align(imgpair, nullptr, LV_ALIGN_CENTER, 0, 10);
@@ -610,8 +608,8 @@ bool Clock::Refresh() {
         char sp[4];
         spO2 = heartRateSensor.ReadSpO2();
         if(!checktemp) break;
-        if(mod>=1000) {sprintf(sp, "%d%%",t); lv_label_set_text(heartbeatValue, sp);}
-        if(mod>1001) break;
+        if(mod>=700) {sprintf(sp, "%d%%",t); lv_label_set_text(heartbeatValue, sp);}
+        if(mod>701) break;
         t=98+rand()%2;
         mod++;      
         if((spO2<20)||(spO2>100)) {
@@ -778,6 +776,7 @@ void Clock::buttonEven(lv_obj_t *obj, Modes mode){
               batteryController.setButtonData(0x13);     
               batteryController.setcheckVibrate(false);
               batteryController.setisButtonPushed(true); 
+              batteryController.setGoToSleep(true);
           }
           break;
     case Modes::Fall:
@@ -790,6 +789,7 @@ void Clock::buttonEven(lv_obj_t *obj, Modes mode){
               batteryController.setButtonData(0x04);       
               batteryController.setcheckVibrate(false);
               batteryController.setisButtonPushed(true); 
+              batteryController.setGoToSleep(true);
           }
           break;
     default:

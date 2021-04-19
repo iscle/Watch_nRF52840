@@ -105,7 +105,7 @@ void SystemTask::Work() {
   pinConfig.pull = (nrf_gpio_pin_pull_t)GPIO_PIN_CNF_PULL_Pullup;
   nrfx_gpiote_in_init(pinTouchIrq, &pinConfig, nrfx_gpiote_evt_handler); 
   
-  idleTimer = xTimerCreate ("idleTimer", pdMS_TO_TICKS(20000), pdFALSE, this, IdleTimerCallback);
+  idleTimer = xTimerCreate ("idleTimer", pdMS_TO_TICKS(25000), pdFALSE, this, IdleTimerCallback);
   idleTimerAcc = xTimerCreate ("idleTimerAcc", pdMS_TO_TICKS(100), pdTRUE, this, IdleTimerAccCallback);
   idleTimerTracking = xTimerCreate ("idleTimerAcc", pdMS_TO_TICKS(60000), pdTRUE, this, IdleTimerTrackingCallback);
   idleTimerHeartbeat = xTimerCreate ("idleTimerHeartbeat", pdMS_TO_TICKS(60000), pdTRUE, this, IdleTimerHeartbeatCallback);
@@ -140,6 +140,7 @@ void SystemTask::Work() {
           xTimerStop(idleTimer, 0);
           displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::Clock);
           displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::GoToSleep);
+          heartRateSensor.Disable(); 
           break;
         case Messages::BleConnected:
           ReloadIdleTimer();
@@ -315,9 +316,7 @@ void SystemTask::ReadTempSensor() {
 }
 
 void SystemTask::CheckACC() { 
-
 if(bleController.IsConnected()) {
-
   accValue = motionSensor.Process();
   if(accValue>batteryController.getfallHighpeak()) {isHandDiscoveryTimerRunning =true;}
   if(accValue>batteryController.getimpactzz()) {isImpactDiscoveryTimerRunning =true;}

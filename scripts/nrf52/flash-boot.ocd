@@ -25,7 +25,7 @@ echo ""
 echo "Flashing Bootloader..."
 
 # For MCUBoot (debugging not supported):
-program /home/dthien/DeviceDownload/Watch_nRF52/build/src/Watch-graphics-0.9.0.bin 0x00000000
+program /home/dthien/DeviceDownload/Watch_nRF52840/bootloader/bootloader.bin 0x00000000
 
 # For Stub Bootloader (supports debugging):
 # program bin/targets/nrf52_boot/app/apps/boot_stub/boot_stub.elf.bin verify 0x00000000

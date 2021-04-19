@@ -268,11 +268,11 @@ void DisplayApp::SwichApp(uint8_t app ){
         currentScreen.reset(new Screens::Clock(this, dateTimeController, batteryController, bleController, tempSensor, Screens::Clock::Modes::Test));
         break;
       case 2:
-        systemTask.PushMessage(System::SystemTask::Messages::AlwaysDisplay);
+        //systemTask.PushMessage(System::SystemTask::Messages::AlwaysDisplay);
         currentScreen.reset(new Screens::Clock(this, dateTimeController, batteryController, bleController, tempSensor,Screens::Clock::Modes::Sensor));
         break;
       case 3:
-        systemTask.PushMessage(System::SystemTask::Messages::AlwaysDisplay);
+       // systemTask.PushMessage(System::SystemTask::Messages::AlwaysDisplay);
         currentScreen.reset(new Screens::Clock(this, dateTimeController, batteryController, bleController, tempSensor,Screens::Clock::Modes::Oxi));
         break;
       case 4:

@@ -31,3 +31,7 @@ void MotorControllerSetDuration(uint32_t motorDuration) {
     nrf_gpio_pin_set(pinMotor);
     app_timer_start(vibTimer, APP_TIMER_TICKS(motorDuration), NULL); 
 }
+
+void MotorControllerStop(){
+    nrf_gpio_pin_clear(pinMotor);
+}

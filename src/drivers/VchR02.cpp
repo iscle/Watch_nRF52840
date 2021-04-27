@@ -19,14 +19,14 @@ float __hardfp_sin(float x){return sin(x);}
 
 
 void VchR02::HrInit() {
-  nrf_gpio_cfg_output(17);
-  nrf_gpio_pin_set(17); 
+  //nrf_gpio_cfg_output(17);
+ // nrf_gpio_pin_set(17); 
   HeartInt();
 }
 
 void VchR02::SpO2Init() {
-  nrf_gpio_cfg_output(17);
-  nrf_gpio_pin_set(17); 
+  //nrf_gpio_cfg_output(17);
+  //nrf_gpio_pin_set(17); 
   SpO2Int();
 }
 void VchR02::TempInt() {
@@ -35,6 +35,8 @@ void VchR02::TempInt() {
   TempInt();
 }
 void VchR02::Enable(){
+nrf_gpio_cfg_output(17);
+nrf_gpio_pin_set(17); 
 HeartSpO2Int();
 }
 

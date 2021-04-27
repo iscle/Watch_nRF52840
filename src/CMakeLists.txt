@@ -74,7 +74,7 @@ set(SDK_SOURCE_FILES
         "${NRF5_SDK_PATH}/components/libraries/scheduler/app_scheduler.c"
         "${NRF5_SDK_PATH}/components/libraries/timer/app_timer.c"
         "${NRF5_SDK_PATH}/integration/nrfx/legacy/nrf_drv_timer.h"
-        "${NRF5_SDK_PATH}/modules/nrfx/drivers/src/nrfx_timer.c"
+        #"${NRF5_SDK_PATH}/modules/nrfx/drivers/src/nrfx_timer.c"
         
 
         # Segger RTT
@@ -376,7 +376,11 @@ list(APPEND IMAGE_FILES
         displayapp/icons/battery/discharingicon.c   
         displayapp/icons/clock/leftCircle.c 
         displayapp/icons/clock/topCircle.c  
-        displayapp/icons/clock/rightCircle.c   
+        displayapp/icons/clock/rightCircle.c  
+        displayapp/icons/clock/leftCircleSmall.c 
+        displayapp/icons/clock/topCircleSmall.c
+        displayapp/icons/clock/rightCircleSmall.c
+        displayapp/icons/clock/bottomCircleSmall.c
         )
 
 list(APPEND SOURCE_FILES

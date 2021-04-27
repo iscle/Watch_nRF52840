@@ -74,7 +74,6 @@ Watch::Drivers::TwiMaster twiMaster{Watch::Drivers::TwiMaster::Modules::TWIM1,
 Watch::Drivers::Cst816S touchPanel {twiMaster, touchPanelTwiAddress};
 //Watch::Drivers::Kx022 motionSensor{twiMaster, motionSensorTwiAddress};
 
-
 Watch::Components::LittleVgl lvgl {lcd, touchPanel};
 
 TimerHandle_t debounceTimer;

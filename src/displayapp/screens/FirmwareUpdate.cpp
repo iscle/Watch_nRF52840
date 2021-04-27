@@ -11,6 +11,12 @@ extern lv_font_t San_Francisco_50;
 FirmwareUpdate::FirmwareUpdate(Watch::Applications::DisplayApp *app, Watch::Controllers::Ble& bleController) :
       Screen(app), bleController{bleController} {
 
+  backgroundLabel = lv_label_create(lv_scr_act(), nullptr);
+  lv_label_set_long_mode(backgroundLabel, LV_LABEL_LONG_CROP);
+  lv_obj_set_size(backgroundLabel, 240, 240);
+  lv_obj_set_pos(backgroundLabel, 0, 0);
+  lv_label_set_text(backgroundLabel, "");    
+
   titleLabel = lv_label_create(lv_scr_act(), nullptr);
   lv_label_set_text(titleLabel, "Firmware update");
   lv_obj_set_auto_realign(titleLabel, true);

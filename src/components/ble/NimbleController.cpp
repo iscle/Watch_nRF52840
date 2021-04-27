@@ -62,7 +62,6 @@ void NimbleController::Init() {
   //batteryInformationService.Init();
   //immediateAlertService.Init();
   keyfob.Init();
-  //dataSensor.Init();
   int res;
   res = ble_hs_util_ensure_addr(0);
   ASSERT(res == 0);
@@ -74,25 +73,26 @@ void NimbleController::Init() {
   bleController.AddressType((addrType == 0) ? Ble::AddressTypes::Public : Ble::AddressTypes::Random);
   bleController.Address(std::move(address));
 
-  res = ble_gatts_start();
-  ASSERT(res == 0);
   auto& bleAddr = bleController.Address();
-  
   sprintf(deviceName, "SA%02x%02x%02x",bleAddr[2], bleAddr[1], bleAddr[0]);
   res = ble_svc_gap_device_name_set(deviceName);
-    ASSERT(res == 0); 
+  ASSERT(res == 0);
+
+  res = ble_gatts_start();
+  ASSERT(res == 0);
   }
 
 
 void NimbleController::ble_checkevent()
 {
   keyfob.ble_checkevent();
-  //dataSensor.ble_checkevent();
 }
 
 void NimbleController::StartAdvertising() {
   if(bleController.IsConnected() || ble_gap_conn_active() || ble_gap_adv_active()) return;
+
   ble_svc_gap_device_name_set(deviceName);
+
   /* set adv parameters */
   struct ble_gap_adv_params adv_params;
   struct ble_hs_adv_fields fields;

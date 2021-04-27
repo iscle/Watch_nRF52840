@@ -6,6 +6,7 @@
 
         void MotorControllerInit();
         void MotorControllerSetDuration(uint32_t motorDuration);
+        void MotorControllerStop();
 
 #ifdef __cplusplus
 }

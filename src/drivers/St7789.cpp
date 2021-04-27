@@ -7,13 +7,16 @@
 using namespace Watch::Drivers;
 
 St7789::St7789(Spi &spi, uint8_t pinDataCommand) : spi{spi}, pinDataCommand{pinDataCommand} {
+
 }
+
 
 void St7789::Init() {
   spi.Init();
   nrf_gpio_cfg_output(pinDataCommand);
-  nrf_gpio_cfg_output(3);
   nrf_gpio_cfg_output(2);
+  nrf_gpio_cfg_output(3);
+  nrf_gpio_pin_set(2);
   nrf_gpio_pin_set(3);
   HardwareReset();
   SoftwareReset();
@@ -98,7 +101,6 @@ void St7789::NormalModeOn() {
 
 void St7789::DisplayOn() {
   WriteCommand(static_cast<uint8_t>(Commands::DisplayOn));
-  nrf_delay_ms(100);
   nrf_gpio_pin_set(2);
 }
 
@@ -124,7 +126,6 @@ void St7789::WriteToRam() {
 
 void St7789::DisplayOff() {
   nrf_gpio_pin_clear(2);
-  nrf_delay_ms(100);
   WriteCommand(static_cast<uint8_t>(Commands::DisplayOff));
   nrf_delay_ms(10);
 }
@@ -171,13 +172,6 @@ void St7789::BeginDrawBuffer(uint16_t x, uint16_t y, uint16_t width, uint16_t he
   nrf_gpio_pin_set(pinDataCommand);
 }
 
-
-void St7789::DrawBuffer(uint16_t x, uint16_t y, uint16_t width, uint16_t height, const uint8_t *data, size_t size) {
-  SetAddrWindow(x, y, x + width - 1, y + height - 1);
-  nrf_gpio_pin_set(pinDataCommand);
-  WriteSpi(data, size);
-}
-
 void St7789::NextDrawBuffer(const uint8_t *data, size_t size) {
   WriteSpi(data, size);
 }
@@ -190,13 +184,14 @@ void St7789::HardwareReset() {
 
 void St7789::Sleep() {
   nrf_gpio_pin_clear(2);
-  nrf_delay_ms(20);
   SleepIn();
   nrf_gpio_cfg_default(pinDataCommand);  
+  //NRF_LOG_INFO("[LCD] Sleep");
 }
 
 void St7789::Wakeup() {
   nrf_gpio_cfg_output(pinDataCommand);
+  // TODO why do we need to reset the controller?
   HardwareReset();
   SoftwareReset();
   SleepOut();
@@ -208,9 +203,11 @@ void St7789::Wakeup() {
   NormalModeOn();
   VerticalScrollStartAddress(verticalScrollingStartAddress);
   DisplayOn();
+  //NRF_LOG_INFO("[LCD] Wakeup")
 }
 void St7789::SetOrientation(Orientation orientation)
-{  // clear and set (MY,MX,MV,ML bits on MADCTL register)
+{
+  // clear and set (MY,MX,MV,ML bits on MADCTL register)
   madctlReg &= ~0xf0;
   madctlReg |= (uint8_t) orientation;
   MemoryDataAccessControl();

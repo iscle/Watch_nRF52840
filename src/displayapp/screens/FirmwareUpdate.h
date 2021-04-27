@@ -22,7 +22,8 @@ namespace Watch {
           enum class States { Idle, Running, Validated, Error };
           Watch::Controllers::Ble& bleController;  
           lv_obj_t* titleLabel;         
-          lv_obj_t* percentLabel;                 
+          lv_obj_t* percentLabel; 
+          lv_obj_t* backgroundLabel;                 
           mutable char percentStr[10];
           bool running = true;
           States state;

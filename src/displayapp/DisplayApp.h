@@ -30,7 +30,7 @@ namespace Watch {
     class DisplayApp {
       public:
         enum class States {Idle, Running};
-        enum class Messages : uint8_t {GoToSleep, GoToRunning, TouchEvent, UpdateBleConnection,Charging,ButtonPushed, BleFirmwareUpdateStarted,Impact,Fall,CheckIn,Clock,Lowbattery};
+        enum class Messages : uint8_t {GoToSleep, GoToRunning,TouchEvent, UpdateBleConnection,Charging,ButtonPushed, BleFirmwareUpdateStarted,Impact,Fall,CheckIn,Clock,Lowbattery};
         enum class TouchModes { Gestures, Polling };
          enum class FullRefreshDirections { None, Up, Down, Left, Right, LeftAnim, RightAnim };
 

@@ -29,7 +29,7 @@ namespace Watch {
     class SystemTask {
       public:
         enum class Messages {GoToSleep, GoToRunning, BleConnected,
-            BleFirmwareUpdateStarted, BleFirmwareUpdateFinished, OnTouchEvent, OnButtonEvent, OnDisplayTaskSleeping, AlwaysDisplay };
+            BleFirmwareUpdateStarted, BleFirmwareUpdateFinished, OnTouchEvent, OnButtonEvent, OnDisplayTaskSleeping, AlwaysDisplay,UpdateTimeOut};
   
        SystemTask(Drivers::SpiMaster &spi, Drivers::St7789 &lcd,
                    Watch::Drivers::SpiNorFlash& spiNorFlash,
@@ -55,7 +55,7 @@ namespace Watch {
         void CheckACC();
         void CheckTracking();
         void CheckHeartbeat();
-
+        void UpdateTimeOut(uint32_t timeout);
 
         Watch::Controllers::NimbleController& nimble() {return nimbleController;};
 
@@ -101,6 +101,8 @@ namespace Watch {
         static void Process(void* instance);
         void Work();
         void ReloadIdleTimer() const;
+        void CheckLowbattery();
+        void CheckCheckIn();
         
         bool isTouchDiscoveryTimerRunning = false;
         uint8_t TouchDiscoveryTimer = 2;

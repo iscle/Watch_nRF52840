@@ -11,6 +11,7 @@ namespace Watch {
     
     class Battery {
       public:
+        Battery();
         void Init();
         void Update();
         float PercentRemaining() const { return percentRemaining;}
@@ -33,6 +34,7 @@ namespace Watch {
         void setIsAlert(uint8_t data);    
         void setCurrentHour(uint8_t data) ;
         void setCurrentMinute(uint8_t data);
+        void setCurrentSecond(uint8_t data);
         void setIsheartbeat(bool data);
         void setIstracking(bool data);
         void setIslowbattery(bool data);
@@ -40,15 +42,17 @@ namespace Watch {
         void setisButtonPushed(bool data);
         void setDisturnOff(bool data);
         void setTouch( uint8_t x, uint8_t y);
+        void setTimeOff(uint32_t data);
 
         uint8_t getCurrentHour(){return currentHour;} ;
-        uint8_t getCurrentMinute(){return currentMinute;};       
+        uint8_t getCurrentMinute(){return currentMinute;};  
+        uint8_t getCurrentSecond(){return currentSecond;};     
         float getimpactzz(){return (impactzz&0x0f)*0.1+((impactzz&0xf0)>>4);};
         uint8_t getimpactyy() { return impactyy; };
         uint8_t getcheckinzz() {return checkinzz;};
         uint8_t getcheckinyy() {return checkinyy;};
         float getfallHighpeak() {return (fallHighpeak&0x0f)*0.1+((fallHighpeak&0xf0)>>4);};
-        float getffallLowpeak() {return (fallLowpeak&0x0f)*0.1+((fallLowpeak&0xf0)>>4);};
+        float getfallLowpeak() {return (fallLowpeak&0x0f)*0.1+((fallLowpeak&0xf0)>>4);};
         uint8_t getfalltime() {return (falltime&0x0f)+((falltime&0xf0)>>4)*10;};
         uint8_t getCheckinTime1() {return (CheckinTime1&0x0f)+((CheckinTime1&0xf0)>>4)*10;};
         uint8_t getCheckinTime2() {return (CheckinTime2&0x0f)+((CheckinTime2&0xf0)>>4)*10;};
@@ -79,12 +83,21 @@ namespace Watch {
         uint8_t gettimeheartbeat(){return timeheartbeat;}
         bool getIslowbattery(){return islowbattery;}
         bool getDisturnOff(){return isDisturnOff;}
+        void StopVibrate(void);
 
       private:
+        static Battery *instance;
+        nrf_saadc_value_t  saadc_value;
         uint8_t chargingPin = 19;
         uint8_t powerPresentPin = 20;
         static constexpr nrf_saadc_input_t batteryVoltageAdcInput = NRF_SAADC_INPUT_AIN4;
-        static void SaadcEventHandler(nrfx_saadc_evt_t const * p_event);
+        void SaadcInit();
+
+        void SaadcEventHandler(nrfx_saadc_evt_t const * p_event);
+        static void adcCallbackStatic(nrfx_saadc_evt_t const *event);
+        static constexpr uint8_t percentRemainingSamples = 5;
+        bool isReading = false;
+        uint8_t samples = 0;
         float percentRemaining = 0.0f;
         float voltage = 0.0f;
         bool isCharging = false;
@@ -93,7 +106,7 @@ namespace Watch {
         bool isVibrate = false;
         uint8_t buttonData = 0x02;
         uint8_t impactzz =0x25;
-        uint8_t impactyy=0x02;
+        uint8_t impactyy=0x01;
         uint8_t checkinzz=0x00;
         uint8_t checkinyy=0x00;
         uint8_t fallHighpeak=0x35;
@@ -113,6 +126,7 @@ namespace Watch {
         float AccData=0.0f;
         uint8_t currentHour = 0;
         uint8_t currentMinute = 0;
+        uint8_t currentSecond = 0;
         uint32_t count =0, sum=0;
         uint8_t touchx=0,touchy=0;
         bool istracking = false;
@@ -123,8 +137,7 @@ namespace Watch {
         bool islowbattery = false;
         bool checkVibrate= true;
         bool isButtonPushed = false;
-        bool isDisturnOff = false;
-        
+        bool isDisturnOff = false;        
     };
   }
 }

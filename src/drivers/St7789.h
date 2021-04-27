@@ -23,11 +23,11 @@ namespace Watch {
 
         void BeginDrawBuffer(uint16_t x, uint16_t y, uint16_t width, uint16_t height);
         void NextDrawBuffer(const uint8_t* data, size_t size);
-        void DrawBuffer(uint16_t x, uint16_t y, uint16_t width, uint16_t height, const uint8_t *data, size_t size);
 
         void DisplayOn();
         void DisplayOff();
-
+        void GC9A01_write(uint8_t *data, size_t len) ;
+        void GC9A01_write_continue(uint8_t *data, size_t len) ;
          enum Orientation : uint8_t {
           Orientation_0   = 0x00, // MADCTL[MY=0,MX=0,MV=0]
           Orientation_90  = 0x60, // MADCTL[MY=0,MX=1,MV=1]
@@ -58,18 +58,21 @@ namespace Watch {
         void SetAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
         void WriteCommand(uint8_t cmd);
         void WriteSpi(const uint8_t* data, size_t size);
+        int  WriteData_array(uint8_t *buf, uint32_t len);
+        int GC9A01_databuf(uint32_t len, uint8_t *buf);
+        void GC9A01_run_cfg_script(void);
 
         enum class Commands : uint8_t {
-          SoftwareReset =   0x01,
-          SleepIn =         0x10,
-          SleepOut =        0x11,
-          NormalModeOn =    0x13,
+          SoftwareReset = 0x01,
+          SleepIn = 0x10,
+          SleepOut = 0x11,
+          NormalModeOn = 0x13,
           DisplayInversionOn = 0x21,
-          DisplayOff =      0x28,
-          DisplayOn =       0x29,
+          DisplayOff = 0x28,
+          DisplayOn = 0x29,
           ColumnAddressSet = 0x2a,
-          RowAddressSet =   0x2b,
-          WriteToRam =      0x2c,
+          RowAddressSet = 0x2b,
+          WriteToRam = 0x2c,
           MemoryDataAccessControl = 0x36,
           VerticalScrollDefinition = 0x33,
           VerticalScrollStartAddress = 0x37,
@@ -79,11 +82,9 @@ namespace Watch {
         void ColumnAddressSet();
 
         static constexpr uint16_t Width = 240;
-        static constexpr uint16_t Height = 240;
+        static constexpr uint16_t Height = 320;
         void RowAddressSet();
-        uint8_t id [5];
     };
   }
 }
-
 

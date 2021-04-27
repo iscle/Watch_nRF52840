@@ -31,7 +31,10 @@ static void create_timers(){
 }
 
 void Acnt101::Init() { 
-    nrf_gpio_cfg_output(pinTempOut);      
+    lfclk_request();     
+    app_timer_init();      
+    nrf_gpio_cfg_output(pinTempOut);
+    nrf_gpio_pin_clear(pinTempOut);       
     nrf_gpio_cfg_sense_input(pinTempIn, (nrf_gpio_pin_pull_t)GPIO_PIN_CNF_PULL_Pullup, (nrf_gpio_pin_sense_t)GPIO_PIN_CNF_SENSE_High);
     nrfx_gpiote_in_config_t pinConfig;
     pinConfig.skip_gpio_setup = true;
@@ -40,11 +43,7 @@ void Acnt101::Init() {
     pinConfig.sense = (nrf_gpiote_polarity_t)NRF_GPIOTE_POLARITY_HITOLO;
     pinConfig.pull = (nrf_gpio_pin_pull_t)GPIO_PIN_CNF_PULL_Pullup;
     nrfx_gpiote_in_init(pinTempIn, &pinConfig, nrfx_gpiote_temp_evt_handler); 
-    
-    lfclk_request();        
-    app_timer_init();       
     create_timers(); 
-    nrf_gpio_pin_clear(pinTempOut); 
 }
 
 void Acnt101::timer_temp_start() {    
@@ -56,16 +55,18 @@ void Acnt101::start() {
 }
 
 void Acnt101::stop() {    
-     nrf_gpio_pin_set(pinTempOut);
+     //nrf_gpio_pin_set(pinTempOut);
 }
 
 void Acnt101::ReadData(uint32_t data)
 {
      count++;
-    sumtemp+=(data+110);
+    sumtemp+=(data+0.0f);
     if(count>10) {; 
-    dataTemp=sumtemp/20.0f*0.0625f - 50.0625f;
+    dataTemp=sumtemp/20.0f*0.0625f - 50.0625f +1.5f;
     count =0; sumtemp=0;     
     } 
+    //if(dataTemp<30) dataTemp=dataTemp+5.0f;
+    //else dataTemp=dataTemp+3.0f;
     
 }

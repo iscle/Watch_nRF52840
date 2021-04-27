@@ -80,12 +80,12 @@ void DisplayApp::Refresh() {
   if (xQueueReceive(msgQueue, &msg, queueTimeout)) {
     switch (msg) {
       case Messages::GoToSleep:          
-        lcd.DisplayOff();
+       // lcd.DisplayOff();
         systemTask.PushMessage(System::SystemTask::Messages::OnDisplayTaskSleeping);
         state = States::Idle;
         break;
       case Messages::GoToRunning:         
-        lcd.DisplayOn();           
+        //lcd.DisplayOn();           
         state = States::Running;
         break;
       case Messages::UpdateBleConnection: 
@@ -110,14 +110,14 @@ void DisplayApp::Refresh() {
               SwichApp(appIndex);
                 break; 
               */  
-            case TouchEvents::SwipeRight:
+            case TouchEvents::SwipeLeft:
              if (!bleController.IsConnected() || checkupdate || checkCheckin|| checkFall || checkImpact) break;
               if(appIndex>0) {       
                 appIndex--;
                 SwichApp(appIndex);               
             } else  {appIndex =3;   SwichApp(appIndex);}      
               break;
-           case TouchEvents::SwipeLeft:
+           case TouchEvents::SwipeRight:
              if (!bleController.IsConnected() || checkupdate || checkCheckin|| checkFall || checkImpact) break;
             if(appIndex<3) {     
                 appIndex++;
@@ -261,18 +261,23 @@ void DisplayApp::SwichApp(uint8_t app ){
         checkFall = false;
         checkImpact = false;
         checkCheckin =false;
-        batteryController.setDisturnOff(false);   
+        batteryController.setDisturnOff(false); 
+        appIndex=0;  
+        systemTask.UpdateTimeOut(25000);
       currentScreen.reset(new Screens::Clock(this, dateTimeController, batteryController, bleController, tempSensor,Screens::Clock::Modes::Clock));
         break;
       case 1:
+       systemTask.UpdateTimeOut(25000);
         currentScreen.reset(new Screens::Clock(this, dateTimeController, batteryController, bleController, tempSensor, Screens::Clock::Modes::Test));
         break;
       case 2:
         //systemTask.PushMessage(System::SystemTask::Messages::AlwaysDisplay);
+        systemTask.UpdateTimeOut(70000);
         currentScreen.reset(new Screens::Clock(this, dateTimeController, batteryController, bleController, tempSensor,Screens::Clock::Modes::Sensor));
         break;
       case 3:
-       // systemTask.PushMessage(System::SystemTask::Messages::AlwaysDisplay);
+       systemTask.UpdateTimeOut(40000);
+        //systemTask.PushMessage(System::SystemTask::Messages::AlwaysDisplay);
         currentScreen.reset(new Screens::Clock(this, dateTimeController, batteryController, bleController, tempSensor,Screens::Clock::Modes::Oxi));
         break;
       case 4:

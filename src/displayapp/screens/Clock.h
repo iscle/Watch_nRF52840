@@ -50,7 +50,8 @@ namespace Watch {
           static char const *DaysString[];
           static char const *MonthsString[];
 
-          lv_obj_t* logo;   
+          lv_obj_t* logo; 
+          lv_obj_t* backgroundLabel;  
           lv_obj_t* label_time;
           lv_obj_t* label_date;
           lv_obj_t* batteryIcon;
@@ -71,7 +72,11 @@ namespace Watch {
           lv_obj_t* lableleftCircle;
           lv_obj_t* labletopCircle;
           lv_obj_t* lablerightCircle;
-          lv_obj_t* lablebottomCircle;
+          lv_obj_t* lableleftCircleSmall;
+          lv_obj_t* labletopCircleSmall;
+          lv_obj_t* lablerightCircleSmall;
+          lv_obj_t* lablebottomCircleSmall;
+          
             
           Controllers::DateTime& dateTimeController;
           Controllers::Battery& batteryController;
@@ -84,6 +89,7 @@ namespace Watch {
           bool running = true;
           uint32_t timeoutCountStart;
           uint32_t timeoutCountStartL;
+          uint32_t timeoutCountStartH;
           uint32_t timeout;
           bool checkVibrate= true;          
           bool checkcharging = false;
@@ -97,7 +103,8 @@ namespace Watch {
           int mod =0;
           int modt =0;
           bool checkTouchBigButton =false;
-          bool checkTouchBigButtonF =false;
+          float rawTemp =0.0;
+
 
       };
     }

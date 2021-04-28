@@ -103,6 +103,7 @@ namespace Watch {
         void ReloadIdleTimer() const;
         void CheckLowbattery();
         void CheckCheckIn();
+        void GoToRunning();
         
         bool isTouchDiscoveryTimerRunning = false;
         uint8_t TouchDiscoveryTimer = 2;
@@ -121,7 +122,7 @@ namespace Watch {
         uint8_t Touch=0;
         bool checkcharging = false;
         bool checklowbattery = false;
-        void GoToRunning();
+      
         bool checkbright= false;
         uint8_t BrightDiscoveryTimer = 0;
         uint8_t prehour=0;

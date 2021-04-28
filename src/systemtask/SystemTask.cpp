@@ -129,7 +129,7 @@ void SystemTask::Work() {
           //spiNorFlash.Wakeup();
           //touchPanel.Wakeup();
           lcd.Wakeup();  
-          motionSensor.Init();                
+          //motionSensor.Init();                
           displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::GoToRunning);
           isSleeping = false;
           isWakingUp = false;         
@@ -205,13 +205,13 @@ void SystemTask::Work() {
         TouchDiscoveryTimer--;
       }
     }    
-
+/*
     if(!checkcharging && batteryController.CheckCharging())
     { if(isSleeping) GoToRunning();
       displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::Charging);
     }
     checkcharging=batteryController.CheckCharging();
-
+*/
 
     if(batteryController.Istracking()){  
       if (batteryController.getIsAlert()!=preAlert) { 
@@ -300,7 +300,8 @@ void SystemTask::ReadTempSensor() {
 }
 
 void SystemTask::CheckACC() { 
-if(bleController.IsConnected()) {
+//if(bleController.IsConnected())
+ {
   nimbleController.ble_checkevent();
   if(motionSensor.Process()>batteryController.getfallHighpeak()) {isHandDiscoveryTimerRunning =true;}
   if(motionSensor.Process()>batteryController.getimpactzz()) {isImpactDiscoveryTimerRunning =true;}

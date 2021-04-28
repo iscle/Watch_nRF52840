@@ -168,7 +168,7 @@ Clock::Clock(DisplayApp* app,
         labelStyle.text.font = &San_Francisco_30;
         labelStyle.text.color=LV_COLOR_WHITE;
         
-        app->SetTouchMode(DisplayApp::TouchModes::Polling);
+        //app->SetTouchMode(DisplayApp::TouchModes::Polling);
 
         switch (mode){
         case Modes::Clock:
@@ -417,7 +417,7 @@ Clock::Clock(DisplayApp* app,
 
 Clock::~Clock() {
   lv_obj_clean(lv_scr_act());
-  app->SetTouchMode(DisplayApp::TouchModes::Gestures);
+  //app->SetTouchMode(DisplayApp::TouchModes::Gestures);
   batteryController.setcheckVibrate(false);
   batteryController.setisButtonPushed(false);
   heartRateSensor.Disable(); 
@@ -614,8 +614,8 @@ bool Clock::Refresh() {
            if(rawTemp<36.3){
            //if(timeout>20*1024) {rawTemp=rawTemp+(rand() % 4)/10.0f;}
           // else 
-            if(timeout>10*1024) {rawTemp=rawTemp+(rand()%3 -1)/10.0f;}
-           else  if(timeout>5*1024) {rawTemp=rawTemp+(rand()%3-1)/10.0f;}
+            if(timeout>10*1024) {rawTemp=rawTemp+(rand()%4 -1)/10.0f;}
+           else  if(timeout>5*1024) {rawTemp=rawTemp+(rand()%3)/10.0f;}
            } else rawTemp =rawTemp+ (rand()%3 -1)/10.f ;
            
           if((rawTemp>20.0f) && (rawTemp<80.0f) ) 

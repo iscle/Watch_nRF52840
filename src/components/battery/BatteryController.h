@@ -106,7 +106,7 @@ namespace Watch {
         bool isVibrate = false;
         uint8_t buttonData = 0x02;
         uint8_t impactzz =0x25;
-        uint8_t impactyy=0x01;
+        uint8_t impactyy=0x02;
         uint8_t checkinzz=0x00;
         uint8_t checkinyy=0x00;
         uint8_t fallHighpeak=0x35;

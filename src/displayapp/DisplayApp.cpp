@@ -39,7 +39,8 @@ DisplayApp::DisplayApp(Drivers::St7789 &lcd, Components::LittleVgl &lvgl, Driver
         touchPanel{touchPanel},        
         systemTask{systemTask},
         tempSensor{tempSensor} {
-          if(bleController.IsConnected()) SwichApp(0); else  {SwichApp(7); batteryController.setIsVibrate();}
+        //  if(bleController.IsConnected()) SwichApp(0); else  {SwichApp(7); batteryController.setIsVibrate();}
+        SwichApp(0);
           msgQueue = xQueueCreate(queueSize, itemSize);
           onClockApp = true;         
         }
@@ -91,8 +92,9 @@ void DisplayApp::Refresh() {
       case Messages::UpdateBleConnection: 
         batteryController.setIsVibrate();
         validator.Validate();     
-        if(bleController.IsConnected()) { SwichApp(1);   appIndex =1; }          
-        else SwichApp(7);           
+        //if(bleController.IsConnected()) { SwichApp(1);   appIndex =1; }          
+        //else SwichApp(7);   
+        SwichApp(1);   appIndex =1;        
         break;
       case Messages::Charging:
         batteryController.setDisturnOff(false);     
@@ -111,14 +113,14 @@ void DisplayApp::Refresh() {
                 break; 
               */  
             case TouchEvents::SwipeLeft:
-             if (!bleController.IsConnected() || checkupdate || checkCheckin|| checkFall || checkImpact) break;
+             //if (!bleController.IsConnected() || checkupdate || checkCheckin|| checkFall || checkImpact) break;
               if(appIndex>0) {       
                 appIndex--;
                 SwichApp(appIndex);               
             } else  {appIndex =3;   SwichApp(appIndex);}      
               break;
            case TouchEvents::SwipeRight:
-             if (!bleController.IsConnected() || checkupdate || checkCheckin|| checkFall || checkImpact) break;
+             //if (!bleController.IsConnected() || checkupdate || checkCheckin|| checkFall || checkImpact) break;
             if(appIndex<3) {     
                 appIndex++;
                 SwichApp(appIndex);               
@@ -138,7 +140,8 @@ void DisplayApp::Refresh() {
           batteryController.setDisturnOff(false);
           nrf_gpio_pin_clear(2);               
           appIndex=0;
-          if(bleController.IsConnected()) SwichApp(0); else  SwichApp(7);
+          //if(bleController.IsConnected()) SwichApp(0); else  SwichApp(7);
+           SwichApp(0);
           systemTask.PushMessage(System::SystemTask::Messages::GoToSleep); 
           break;
 
@@ -177,7 +180,8 @@ void DisplayApp::Refresh() {
 
       case Messages::Clock: 
           batteryController.setDisturnOff(false);
-          if(bleController.IsConnected()) SwichApp(0); else  SwichApp(7);       
+         // if(bleController.IsConnected()) SwichApp(0); else  SwichApp(7);  
+          SwichApp(0);     
           break;
 
       case Messages::Lowbattery: 

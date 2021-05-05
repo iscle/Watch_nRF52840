@@ -99,7 +99,7 @@ void Battery::setButtonDataNoVibrate( uint8_t data) {
 void Battery::setIsTouch( bool data) {  isTouch = data;}  
 void Battery::setIsVibrate(void){ MotorControllerSetDuration(200);} 
 void Battery::StopVibrate(void) {MotorControllerStop();}
-bool Battery::CheckCharging()  { return !nrf_gpio_pin_read(chargingPin);}
+
 
 
 void Battery::impactCharacteristic(uint8_t zz, uint8_t yy){
@@ -201,6 +201,15 @@ void Battery::setcheckVibrate(bool data){checkVibrate=data;}
 void Battery::setisButtonPushed(bool data){isButtonPushed=data;}
 void Battery::setDisturnOff(bool data){isDisturnOff=data;};
 
+void Battery::setxyz( int8_t _x,int8_t _y,int8_t _z) {
+x=_x;
+y=_y;
+z=_z;
+}
+
+void Battery::setXmax(int8_t x){xmax=x;};
+void Battery::setYmax(int8_t y){ymax=y;};
+void Battery::setZmax(int8_t z){zmax=z;};
 
 
 

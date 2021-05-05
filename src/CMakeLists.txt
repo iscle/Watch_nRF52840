@@ -381,6 +381,10 @@ list(APPEND IMAGE_FILES
         displayapp/icons/clock/topCircleSmall.c
         displayapp/icons/clock/rightCircleSmall.c
         displayapp/icons/clock/bottomCircleSmall.c
+        displayapp/icons/clock/pointtemp.c
+        displayapp/icons/clock/bpm.c
+        displayapp/icons/temp/ftemp.c
+        displayapp/icons/temp/ctemp.c
         )
 
 list(APPEND SOURCE_FILES

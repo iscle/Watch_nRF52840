@@ -120,7 +120,7 @@ namespace Watch {
         bool sendLowbattery= true;
         uint32_t tempData = 0;
         uint8_t Touch=0;
-        bool checkcharging = false;
+        bool checkcharging = true;
         bool checklowbattery = false;
       
         bool checkbright= false;

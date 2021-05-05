@@ -42,3 +42,20 @@ float Kx126::Process() {
  // return 0;                                                                                                                                                                                                                                                                                                                                                                          
 }
 
+Kx126::Values Kx126::ProcessTest() {
+
+    spi.Read(&KX126_XOUT_L, 1, RawSensor._ucharArr, 2);
+    x1 =RawSensor._intArr[0];
+    spi.Read(&KX126_YOUT_L, 1, RawSensor._ucharArr, 2);
+    y1 =RawSensor._intArr[0];
+    spi.Read(&KX126_ZOUT_L, 1, RawSensor._ucharArr, 2);
+    z1 =RawSensor._intArr[0];
+
+	int8_t valuex =x1*10.0f/4096.0f;
+	int8_t valuey =y1*10.0f/4096.0f;
+	int8_t valuez =z1*10.0f/4096.0f;
+//return  sqrt(valuex*valuex+valuey*valuey+valuez*valuez)/3.0f;
+return   {1, valuex, valuey, valuez};                                                                                                                                                                                                                                                                                                                                                                                    
+}
+
+

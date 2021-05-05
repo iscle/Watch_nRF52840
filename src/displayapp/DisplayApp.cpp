@@ -94,10 +94,6 @@ void DisplayApp::Refresh() {
         if(bleController.IsConnected()) { SwichApp(1);   appIndex =1; }          
         else SwichApp(7);           
         break;
-      case Messages::Charging:
-        batteryController.setDisturnOff(false);     
-        SwichApp(8);
-        break;
       case Messages::TouchEvent: {
         if (state != States::Running) break;
         auto gesture = OnTouchEvent();
@@ -115,11 +111,11 @@ void DisplayApp::Refresh() {
               if(appIndex>0) {       
                 appIndex--;
                 SwichApp(appIndex);               
-            } else  {appIndex =3;   SwichApp(appIndex);}      
+            } else  {appIndex =4;   SwichApp(appIndex);}      
               break;
            case TouchEvents::SwipeRight:
              if (!bleController.IsConnected() || checkupdate || checkCheckin|| checkFall || checkImpact) break;
-            if(appIndex<3) {     
+            if(appIndex<4) {     
                 appIndex++;
                 SwichApp(appIndex);               
               } else {appIndex =0;   SwichApp(appIndex);} 
@@ -156,7 +152,7 @@ void DisplayApp::Refresh() {
           batteryController.setButtonData(0x12); 
           batteryController.setIsAlert(0x12); 
           systemTask.PushMessage(System::SystemTask::Messages::AlwaysDisplay);    
-          SwichApp(4);      
+          SwichApp(5);      
           break;
 
       case Messages::Fall: 
@@ -165,7 +161,7 @@ void DisplayApp::Refresh() {
           batteryController.setButtonData(0x08);
           batteryController.setIsAlert(0x08); 
           systemTask.PushMessage(System::SystemTask::Messages::AlwaysDisplay);     
-          SwichApp(5);      
+          SwichApp(6);      
           break;
 
       case Messages::CheckIn:  
@@ -183,6 +179,12 @@ void DisplayApp::Refresh() {
       case Messages::Lowbattery: 
           batteryController.setDisturnOff(false);
           SwichApp(9);      
+          break;
+      case Messages::Charging:
+          batteryController.setDisturnOff(false);     
+          SwichApp(8);
+          break;
+      default:
           break;
     }
   }
@@ -278,17 +280,22 @@ void DisplayApp::SwichApp(uint8_t app ){
       case 3:
        systemTask.UpdateTimeOut(40000);
         //systemTask.PushMessage(System::SystemTask::Messages::AlwaysDisplay);
-        currentScreen.reset(new Screens::Clock(this, dateTimeController, batteryController, bleController, tempSensor,Screens::Clock::Modes::Oxi));
+        currentScreen.reset(new Screens::Clock(this, dateTimeController, batteryController, bleController, tempSensor,Screens::Clock::Modes::Temp));
         break;
       case 4:
-        currentScreen.reset(new Screens::Clock(this, dateTimeController, batteryController, bleController, tempSensor, Screens::Clock::Modes::Impact));
+       systemTask.UpdateTimeOut(40000);
+        //systemTask.PushMessage(System::SystemTask::Messages::AlwaysDisplay);
+        currentScreen.reset(new Screens::Clock(this, dateTimeController, batteryController, bleController, tempSensor,Screens::Clock::Modes::Oxi));
         break;
       case 5:
-        currentScreen.reset(new Screens::Clock(this, dateTimeController, batteryController, bleController, tempSensor, Screens::Clock::Modes::Fall));
+        currentScreen.reset(new Screens::Clock(this, dateTimeController, batteryController, bleController, tempSensor, Screens::Clock::Modes::Impact));
         break;
       case 6:
+        currentScreen.reset(new Screens::Clock(this, dateTimeController, batteryController, bleController, tempSensor, Screens::Clock::Modes::Fall));
+        break;
+      //case 6:
     // currentScreen.reset(new Screens::FirmwareValidation(this, validator));
-        break; 
+       // break; 
       case 7:
         currentScreen.reset(new Screens::Clock(this, dateTimeController, batteryController, bleController, tempSensor, Screens::Clock::Modes::PairDis));
         appIndex=0;

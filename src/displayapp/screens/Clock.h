@@ -25,7 +25,7 @@ namespace Watch {
 
       class Clock : public Screen {
         public:
-        enum class Modes {Clock, Test, CheckIn, Impact, Fall, Sensor,PairDis, Charging, LowBattery,Oxi};
+        enum class Modes {Clock, Test, CheckIn, Impact, Fall, Sensor,PairDis, Charging, LowBattery,Oxi,Temp};
           Clock(DisplayApp* app,
                   Controllers::DateTime& dateTimeController,
                   Controllers::Battery& batteryController,
@@ -69,6 +69,9 @@ namespace Watch {
           lv_obj_t* labelpoint;  
           lv_obj_t* checkButton;
           lv_obj_t* imgpair; 
+          lv_obj_t* lablebpm;
+          lv_obj_t* lableftemp;
+          lv_obj_t* lablectemp;
           lv_obj_t* lableleftCircle;
           lv_obj_t* labletopCircle;
           lv_obj_t* lablerightCircle;
@@ -76,6 +79,14 @@ namespace Watch {
           lv_obj_t* labletopCircleSmall;
           lv_obj_t* lablerightCircleSmall;
           lv_obj_t* lablebottomCircleSmall;
+          lv_obj_t* Xmax; 
+          lv_obj_t* Ymax;
+          lv_obj_t* Zmax;
+          lv_obj_t* x;
+          lv_obj_t* y;
+          lv_obj_t* z;
+          lv_obj_t* gwatch;
+
           
             
           Controllers::DateTime& dateTimeController;

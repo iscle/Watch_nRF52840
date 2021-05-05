@@ -15,8 +15,8 @@ namespace Watch {
         void Init();
         void Update();
         float PercentRemaining() const { return percentRemaining;}
-        bool IsCharging() const { return isCharging; }
-        bool IsPowerPresent() const { return isPowerPresent; }
+        bool IsCharging() { return isCharging; }
+        bool IsPowerPresent() { return isPowerPresent; }
        
         void setButtonData( uint8_t data);
         void setButtonDataNoVibrate( uint8_t data);
@@ -84,6 +84,18 @@ namespace Watch {
         bool getIslowbattery(){return islowbattery;}
         bool getDisturnOff(){return isDisturnOff;}
         void StopVibrate(void);
+        void setxyz( int8_t _x,int8_t _y,int8_t _z);
+        void setXmax(int8_t x);
+        void setYmax(int8_t y);
+        void setZmax(int8_t z);
+        int8_t getx() { return x;};
+        int8_t gety() { return y;};
+        int8_t getz() { return z;};
+        int8_t getxmax() { return xmax;};
+        int8_t getymax() { return ymax;};
+        int8_t getzmax() { return zmax;};
+
+
 
       private:
         static Battery *instance;
@@ -137,7 +149,14 @@ namespace Watch {
         bool islowbattery = false;
         bool checkVibrate= true;
         bool isButtonPushed = false;
-        bool isDisturnOff = false;        
+        bool isDisturnOff = false; 
+        int8_t x =0;
+        int8_t y=0;
+        int8_t z=0;
+        int8_t xmax =0;
+        int8_t ymax=0;
+        int8_t zmax=0;
+       
     };
   }
 }

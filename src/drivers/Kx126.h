@@ -8,10 +8,10 @@ namespace Watch {
     class Kx126 {
       public:
         struct Values {
-         int16_t steps;
-          float x;
-          float y;
-          float z;
+                 int8_t acc;
+                 int8_t x;
+                 int8_t y;
+                 int8_t z;
         };
 
       union {
@@ -32,6 +32,7 @@ namespace Watch {
 
         void Init();
         float Process();  
+        Values ProcessTest() ;
 
        private: 
 
@@ -83,6 +84,9 @@ namespace Watch {
       int16_t x=0.0f;
       int16_t y=0.0f;
       int16_t z=0.0f;
+      int16_t x1=0.0f;
+      int16_t y1=0.0f;
+      int16_t z1=0.0f;
     };
   }
 }

@@ -12,7 +12,7 @@ namespace Watch {
     private:
       static constexpr uint32_t major = 0;
       static constexpr uint32_t minor = 14;
-      static constexpr uint32_t patch = 3;
-      static constexpr const char* versionString = "0.14.3";
+      static constexpr uint32_t patch = 4;
+      static constexpr const char* versionString = "0.14.4";
   };
 }

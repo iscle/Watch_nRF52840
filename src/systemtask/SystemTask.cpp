@@ -206,7 +206,9 @@ void SystemTask::Work() {
       }
     }    
 
-    if( batteryController.IsCharging() && checkcharging)
+
+
+    if(batteryController.IsCharging() && checkcharging)
     { 
       if(isSleeping) GoToRunning();
       displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::Charging); 

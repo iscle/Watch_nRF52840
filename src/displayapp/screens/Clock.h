@@ -86,6 +86,8 @@ namespace Watch {
           lv_obj_t* y;
           lv_obj_t* z;
           lv_obj_t* gwatch;
+          lv_obj_t* textline1;
+          lv_obj_t* textline2;
 
           
             

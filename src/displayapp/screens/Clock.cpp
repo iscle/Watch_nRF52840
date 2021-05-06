@@ -47,6 +47,7 @@
 #include "displayapp/icons/clock/bpm.c"
 #include "displayapp/icons/temp/ftemp.c"
 #include "displayapp/icons/temp/ctemp.c"
+#include "displayapp/icons/oxi/spo2.c"
 #include "nrf_delay.h"
 
 extern "C" {
@@ -98,6 +99,7 @@ LV_IMG_DECLARE(temp);
 LV_IMG_DECLARE(bpm);
 LV_IMG_DECLARE(ctemp);
 LV_IMG_DECLARE(ftemp);
+LV_IMG_DECLARE(spo2);
 
 static lv_obj_t * lv_icon_create(lv_obj_t*par, const void* img_src){
     lv_obj_t* icon = lv_btn_create( par, NULL);
@@ -118,12 +120,12 @@ static lv_obj_t * lv_icon_create(lv_obj_t*par, const void* img_src){
   return icon;
 }
 
-
+/*
 static void event_handler(lv_obj_t * obj, lv_event_t event) {
     Clock* screen = static_cast<Clock *>(obj->user_data);
      screen->OnObjectEvent(obj, event);
 }
-
+*/
 Clock::Clock(DisplayApp* app,
         Controllers::DateTime& dateTimeController,
         Controllers::Battery& batteryController,
@@ -140,7 +142,7 @@ Clock::Clock(DisplayApp* app,
           lv_obj_set_size(backgroundLabel, 240, 240);
           lv_obj_set_pos(backgroundLabel, 0, 0);
           lv_label_set_text(backgroundLabel, "");    
-
+/*
         if((mode == Modes::Clock) ||(mode == Modes::Test)|| (mode == Modes::Sensor) || (mode == Modes::Oxi)|| (mode == Modes::Temp)){
           labelleft =  lv_icon_create(lv_scr_act(), &arrowleft);  
           labelleft->user_data = this;
@@ -153,7 +155,7 @@ Clock::Clock(DisplayApp* app,
           lv_obj_align(labelright, lv_scr_act(),LV_ALIGN_IN_LEFT_MID, -10, 0);        
         }
 
-
+*/
         batteryIcon = lv_img_create(lv_scr_act(), NULL);
         lv_img_set_src(batteryIcon, &battery_100);        
 
@@ -406,17 +408,27 @@ Clock::Clock(DisplayApp* app,
         case Modes::Sensor: 
           imgSensor = lv_img_create(lv_scr_act(), NULL);  
           lv_img_set_src(imgSensor, &sensor);
-          lv_obj_align(imgSensor, NULL, LV_ALIGN_CENTER, 0, -35);   
+          lv_obj_align(imgSensor, NULL, LV_ALIGN_CENTER, 0, -45); 
+
+          textline1 = lv_label_create(lv_scr_act(), NULL);
+          lv_label_set_style(textline1, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_label_set_text(textline1, "Measurements not for"); 
+          lv_obj_align(textline1, NULL, LV_ALIGN_CENTER, 0, 75); 
+
+          textline2 = lv_label_create(lv_scr_act(), NULL);
+          lv_label_set_style(textline2, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_label_set_text(textline2, "Medical Purposes"); 
+          lv_obj_align(textline2, NULL, LV_ALIGN_CENTER, 0, 95); 
 
           heartbeatValue = lv_label_create(lv_scr_act(), nullptr);
           lv_obj_set_auto_realign(heartbeatValue, true);
           lv_label_set_text(heartbeatValue, "--");
           lv_label_set_style(heartbeatValue,LV_LABEL_STYLE_MAIN,&labelStyle);
-          lv_obj_align(heartbeatValue, lv_scr_act(), LV_ALIGN_IN_BOTTOM_MID, -5, -65); 
+          lv_obj_align(heartbeatValue, lv_scr_act(), LV_ALIGN_CENTER, 0, 20); 
 
           lablebpm  = lv_img_create(lv_scr_act(), NULL);  
           lv_img_set_src(lablebpm, &bpm);
-          lv_obj_align(lablebpm, NULL, LV_ALIGN_CENTER, 0, 80);   
+          lv_obj_align(lablebpm, NULL, LV_ALIGN_CENTER, 0, 50);   
 
           labelpoint  = lv_img_create(lv_scr_act(), NULL);  
           lv_img_set_src(labelpoint, &pointsensor);
@@ -458,34 +470,49 @@ Clock::Clock(DisplayApp* app,
           heartRateSensor.SpO2Init();  
           imgpair = lv_img_create(lv_scr_act(), nullptr);  
           lv_img_set_src(imgpair, &oxi);
-          lv_obj_align(imgpair, nullptr, LV_ALIGN_CENTER, 0, 10);
+          lv_obj_align(imgpair, NULL, LV_ALIGN_CENTER, 0, -45); 
 
           heartbeatValue = lv_label_create(lv_scr_act(), nullptr);
           lv_label_set_text(heartbeatValue, "--");
           lv_label_set_style(heartbeatValue,LV_LABEL_STYLE_MAIN,&labelStyle);
-          lv_obj_align(heartbeatValue, lv_scr_act(), LV_ALIGN_IN_BOTTOM_MID, -10, -65); 
+          lv_obj_align(heartbeatValue, lv_scr_act(), LV_ALIGN_CENTER, 0, 20); 
 
           labelpoint  = lv_img_create(lv_scr_act(), NULL);  
           lv_img_set_src(labelpoint, &pointoxi);
-          lv_obj_align(labelpoint, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0); 
+          lv_obj_align(labelpoint, NULL, LV_ALIGN_IN_BOTTOM_MID, 5, 0); 
+
+          lablebpm  = lv_img_create(lv_scr_act(), NULL);  
+          lv_img_set_src(lablebpm, &spo2);
+          lv_obj_align(lablebpm, NULL, LV_ALIGN_CENTER, 0, 50); 
+
+          textline1 = lv_label_create(lv_scr_act(), NULL);
+          lv_label_set_style(textline1, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_label_set_text(textline1, "Measurements not for"); 
+          lv_obj_align(textline1, NULL, LV_ALIGN_CENTER, 0, 75); 
+
+          textline2 = lv_label_create(lv_scr_act(), NULL);
+          lv_label_set_style(textline2, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_label_set_text(textline2, "Medical Purposes"); 
+          lv_obj_align(textline2, NULL, LV_ALIGN_CENTER, 0, 95); 
+
 
           break;
         case Modes::Temp:
           imgpair = lv_img_create(lv_scr_act(), nullptr);  
           lv_img_set_src(imgpair, &temp);
-          lv_obj_align(imgpair, nullptr, LV_ALIGN_CENTER, 0, -35);
+          lv_obj_align(imgpair, nullptr, LV_ALIGN_CENTER, 0, -45);
 
           tempCValue = lv_label_create(lv_scr_act(), nullptr);
           lv_obj_set_auto_realign(tempCValue, true);
           lv_label_set_text(tempCValue, "--");
           lv_label_set_style( tempCValue,LV_LABEL_STYLE_MAIN,&labelStyle);
-          lv_obj_align( tempCValue,lv_scr_act(), LV_ALIGN_CENTER, 50, 55);
+          lv_obj_align( tempCValue,lv_scr_act(), LV_ALIGN_CENTER, 50, 33);
 
           tempFValue = lv_label_create(lv_scr_act(), nullptr);
           lv_obj_set_auto_realign(tempFValue, true);
           lv_label_set_text(tempFValue, "--");
           lv_label_set_style( tempFValue,LV_LABEL_STYLE_MAIN,&labelStyle);
-          lv_obj_align( tempFValue,lv_scr_act(), LV_ALIGN_CENTER, -50, 55);
+          lv_obj_align( tempFValue,lv_scr_act(), LV_ALIGN_CENTER, -50, 33);
 
           labelpoint  = lv_img_create(lv_scr_act(), NULL);  
           lv_img_set_src(labelpoint, &pointtemp);
@@ -493,15 +520,26 @@ Clock::Clock(DisplayApp* app,
 
           lableftemp  = lv_img_create(lv_scr_act(), nullptr);  
           lv_img_set_src(lableftemp , &ftemp);
-          lv_obj_align(lableftemp , nullptr, LV_ALIGN_CENTER, -50, 85);
+          lv_obj_align(lableftemp , nullptr, LV_ALIGN_CENTER, -50, 50);
 
 
           lablectemp  = lv_img_create(lv_scr_act(), nullptr);  
           lv_img_set_src(lablectemp , &ctemp);
-          lv_obj_align(lablectemp , nullptr, LV_ALIGN_CENTER, 50, 85);
+          lv_obj_align(lablectemp , nullptr, LV_ALIGN_CENTER, 50, 50);
           heartRateSensor.HrInit();
           timeoutCountStart = xTaskGetTickCount();
           rawTemp=35.5f + (rand()% 3)/10.0f ;
+
+          textline1 = lv_label_create(lv_scr_act(), NULL);
+          lv_label_set_style(textline1, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_label_set_text(textline1, "Measurements not for"); 
+          lv_obj_align(textline1, NULL, LV_ALIGN_CENTER, 0, 75); 
+
+          textline2 = lv_label_create(lv_scr_act(), NULL);
+          lv_label_set_style(textline2, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_label_set_text(textline2, "Medical Purposes"); 
+          lv_obj_align(textline2, NULL, LV_ALIGN_CENTER, 0, 95); 
+
 
 
           break;
@@ -853,7 +891,7 @@ char const *Clock::MonthsString[] = {
         "Nov",
         "Dec"
 };
-
+/*
 void Clock::OnObjectEvent(lv_obj_t *obj, lv_event_t event) {
   if(event == LV_EVENT_CLICKED){             
 
@@ -880,7 +918,7 @@ void Clock::OnObjectEvent(lv_obj_t *obj, lv_event_t event) {
      }
   }
 }
-
+*/
 bool Clock::OnButtonPushed() {
   running = false;
    return true;

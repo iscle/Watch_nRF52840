@@ -371,6 +371,7 @@ list(APPEND IMAGE_FILES
         displayapp/icons/bluetooth/pairdis.c
         displayapp/icons/battery/charing.c
         displayapp/icons/oxi/oxi.c
+        displayapp/icons/oxi/spo2.c
         displayapp/icons/clock/pointoxi.c
         displayapp/icons/battery/charingicon.c 
         displayapp/icons/battery/discharingicon.c   

@@ -105,7 +105,7 @@ void DisplayApp::Refresh() {
             case TouchEvents::SwipeUp:
               SwichApp(appIndex);
                 break; 
-              */  
+          */  
             case TouchEvents::SwipeLeft:
              if (!bleController.IsConnected() || checkupdate || checkCheckin|| checkFall || checkImpact) break;
               if(appIndex>0) {       

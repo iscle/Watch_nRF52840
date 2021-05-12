@@ -79,6 +79,7 @@ namespace Watch {
         lv_style_t labelBigStyle;
         lv_style_t labelSanStyle;
         lv_style_t labelSmallStyle;
+        lv_style_t labeltextStyle;
         lv_style_t prim, sec, hint;
         lv_style_t led;
         lv_style_t bar_bg, bar_indic;

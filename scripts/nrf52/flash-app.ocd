@@ -23,7 +23,7 @@ echo ""
 
 # Application address must sync with hw/bsp/nrf52/bsp.yml
 echo "Flashing Application..."
-program /home/dthien/DeviceDownload/Watch_nRF52840/build/src/watch-mcuboot-app-image-0.14.3.bin 0x00008000
+program /home/dthien/DeviceDownload/Watch_nRF52840/build/src/watch-mcuboot-app-image-0.14.7.bin 0x00008000
 echo ""
 
 # Restart the device and start the bootloader.

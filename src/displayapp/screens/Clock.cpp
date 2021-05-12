@@ -57,10 +57,12 @@ extern "C" {
 using namespace Watch::Applications::Screens;
 
 extern lv_font_t San_Francisco_22;
-extern lv_font_t San_Francisco_30;
+//extern lv_font_t San_Francisco_30;
+extern lv_font_t San_Francisco_40;
 extern lv_style_t* LabelBigStyle;
 extern lv_style_t* LabelSanStyle;
 extern lv_style_t* LabelSmallStyle;
+extern lv_style_t* LabeltextStyle;
 LV_IMG_DECLARE(helpButton);  
 LV_IMG_DECLARE(Okbutton);
 LV_IMG_DECLARE(TestButton);
@@ -176,13 +178,12 @@ Clock::Clock(DisplayApp* app,
         lv_obj_align(bleIcon, batteryIcon, LV_ALIGN_OUT_LEFT_MID, -5, 0);
         lv_obj_align(batteryPlug, bleIcon, LV_ALIGN_OUT_LEFT_MID, -5, 0);
 
-         static lv_style_t  labelStyle;
+        static lv_style_t  labelStyle;
         lv_style_copy(& labelStyle, &lv_style_plain);
-        labelStyle.text.font = &San_Francisco_30;
+        labelStyle.text.font = &San_Francisco_40;
         labelStyle.text.color=LV_COLOR_WHITE;
         
-        //app->SetTouchMode(DisplayApp::TouchModes::Polling);
-
+       
         switch (mode){
         case Modes::Clock:
           batteryController.setGoToSleep(true);
@@ -238,6 +239,7 @@ Clock::Clock(DisplayApp* app,
           labelpoint  = lv_img_create(lv_scr_act(), NULL);  
           lv_img_set_src(labelpoint, &pointclock);
           lv_obj_align(labelpoint, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0); 
+          //app->SetTouchMode(DisplayApp::TouchModes::Polling);
           break;
         case Modes::Test:
           batteryController.setGoToSleep(true);
@@ -265,6 +267,7 @@ Clock::Clock(DisplayApp* app,
           lv_obj_align(labelpoint, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0); 
           batteryController.setGoToSleep(true);
           timeoutCountStart = xTaskGetTickCount();
+          // app->SetTouchMode(DisplayApp::TouchModes::Polling);
           break;  
         case Modes::CheckIn:
           buttonBig =  lv_icon_create(lv_scr_act(), &Checkin);  
@@ -345,7 +348,8 @@ Clock::Clock(DisplayApp* app,
           gwatch = lv_label_create(lv_scr_act(), NULL);
           lv_label_set_style(gwatch, LV_LABEL_STYLE_MAIN, LabelSanStyle);
           lv_label_set_text(gwatch, "0"); 
-          lv_obj_align(gwatch, lv_scr_act(), LV_ALIGN_IN_RIGHT_MID, -45, 0); 
+          lv_obj_align(gwatch, lv_scr_act(), LV_ALIGN_IN_RIGHT_MID, -45, 0);
+          //app->SetTouchMode(DisplayApp::TouchModes::Polling); 
 
           break;
         case Modes::Fall:
@@ -403,37 +407,40 @@ Clock::Clock(DisplayApp* app,
           lv_label_set_style(gwatch, LV_LABEL_STYLE_MAIN, LabelSanStyle);
           lv_label_set_text(gwatch, "0"); 
           lv_obj_align(gwatch, lv_scr_act(), LV_ALIGN_IN_RIGHT_MID, -45, 0); 
+          //app->SetTouchMode(DisplayApp::TouchModes::Polling);
 
           break;
         case Modes::Sensor: 
           imgSensor = lv_img_create(lv_scr_act(), NULL);  
           lv_img_set_src(imgSensor, &sensor);
-          lv_obj_align(imgSensor, NULL, LV_ALIGN_CENTER, 0, -45); 
-
-          textline1 = lv_label_create(lv_scr_act(), NULL);
-          lv_label_set_style(textline1, LV_LABEL_STYLE_MAIN, LabelSanStyle);
-          lv_label_set_text(textline1, "Measurements not for"); 
-          lv_obj_align(textline1, NULL, LV_ALIGN_CENTER, 0, 75); 
-
-          textline2 = lv_label_create(lv_scr_act(), NULL);
-          lv_label_set_style(textline2, LV_LABEL_STYLE_MAIN, LabelSanStyle);
-          lv_label_set_text(textline2, "Medical Purposes"); 
-          lv_obj_align(textline2, NULL, LV_ALIGN_CENTER, 0, 95); 
+          lv_obj_align(imgSensor, NULL, LV_ALIGN_CENTER, -40, -15); 
 
           heartbeatValue = lv_label_create(lv_scr_act(), nullptr);
           lv_obj_set_auto_realign(heartbeatValue, true);
           lv_label_set_text(heartbeatValue, "--");
           lv_label_set_style(heartbeatValue,LV_LABEL_STYLE_MAIN,&labelStyle);
-          lv_obj_align(heartbeatValue, lv_scr_act(), LV_ALIGN_CENTER, 0, 20); 
+          lv_obj_align(heartbeatValue, lv_scr_act(), LV_ALIGN_CENTER, 60, -30); 
 
           lablebpm  = lv_img_create(lv_scr_act(), NULL);  
           lv_img_set_src(lablebpm, &bpm);
-          lv_obj_align(lablebpm, NULL, LV_ALIGN_CENTER, 0, 50);   
+          lv_obj_align(lablebpm, NULL, LV_ALIGN_CENTER, 61, 10);   
 
           labelpoint  = lv_img_create(lv_scr_act(), NULL);  
           lv_img_set_src(labelpoint, &pointsensor);
           lv_obj_align(labelpoint, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0); 
+
           heartRateSensor.HrInit();
+
+          textline1 = lv_label_create(lv_scr_act(), NULL);
+          lv_label_set_style(textline1, LV_LABEL_STYLE_MAIN, LabeltextStyle);
+          lv_label_set_text(textline1, "Measurements not for"); 
+          lv_obj_align(textline1, NULL, LV_ALIGN_CENTER, 0, 65); 
+
+          textline2 = lv_label_create(lv_scr_act(), NULL);
+          lv_label_set_style(textline2, LV_LABEL_STYLE_MAIN, LabeltextStyle);
+          lv_label_set_text(textline2, "Medical Purposes"); 
+          lv_obj_align(textline2, NULL, LV_ALIGN_CENTER, 0, 85); 
+
           break;  
         case Modes::PairDis:  
           batteryController.setGoToSleep(true);  
@@ -467,52 +474,60 @@ Clock::Clock(DisplayApp* app,
           break;
 
         case Modes::Oxi:
-          heartRateSensor.SpO2Init();  
+         
           imgpair = lv_img_create(lv_scr_act(), nullptr);  
           lv_img_set_src(imgpair, &oxi);
-          lv_obj_align(imgpair, NULL, LV_ALIGN_CENTER, 0, -45); 
+          lv_obj_align(imgpair, NULL, LV_ALIGN_CENTER, -40, -15); 
 
           heartbeatValue = lv_label_create(lv_scr_act(), nullptr);
           lv_label_set_text(heartbeatValue, "--");
           lv_label_set_style(heartbeatValue,LV_LABEL_STYLE_MAIN,&labelStyle);
-          lv_obj_align(heartbeatValue, lv_scr_act(), LV_ALIGN_CENTER, 0, 20); 
+          lv_obj_align(heartbeatValue, lv_scr_act(), LV_ALIGN_CENTER, 60, -30); 
+          lv_obj_set_auto_realign(heartbeatValue, true);
+          
+          lablepercent = lv_label_create(lv_scr_act(), nullptr);
+          lv_label_set_text(lablepercent, "");
+          lv_label_set_style(lablepercent,LV_LABEL_STYLE_MAIN,LabelSmallStyle);
+          lv_obj_align(lablepercent, lv_scr_act(), LV_ALIGN_CENTER, 85, -30); 
 
           labelpoint  = lv_img_create(lv_scr_act(), NULL);  
           lv_img_set_src(labelpoint, &pointoxi);
-          lv_obj_align(labelpoint, NULL, LV_ALIGN_IN_BOTTOM_MID, 5, 0); 
+          lv_obj_align(labelpoint, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0); 
 
           lablebpm  = lv_img_create(lv_scr_act(), NULL);  
           lv_img_set_src(lablebpm, &spo2);
-          lv_obj_align(lablebpm, NULL, LV_ALIGN_CENTER, 0, 50); 
+          lv_obj_align(lablebpm, NULL, LV_ALIGN_CENTER, 61, 10); 
 
           textline1 = lv_label_create(lv_scr_act(), NULL);
-          lv_label_set_style(textline1, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_label_set_style(textline1, LV_LABEL_STYLE_MAIN, LabeltextStyle);
           lv_label_set_text(textline1, "Measurements not for"); 
-          lv_obj_align(textline1, NULL, LV_ALIGN_CENTER, 0, 75); 
+          lv_obj_align(textline1, NULL, LV_ALIGN_CENTER, 0, 65); 
 
           textline2 = lv_label_create(lv_scr_act(), NULL);
-          lv_label_set_style(textline2, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_label_set_style(textline2, LV_LABEL_STYLE_MAIN, LabeltextStyle);
           lv_label_set_text(textline2, "Medical Purposes"); 
-          lv_obj_align(textline2, NULL, LV_ALIGN_CENTER, 0, 95); 
-
+          lv_obj_align(textline2, NULL, LV_ALIGN_CENTER, 0, 85); 
+          heartRateSensor.SpO2Init();  
 
           break;
         case Modes::Temp:
           imgpair = lv_img_create(lv_scr_act(), nullptr);  
           lv_img_set_src(imgpair, &temp);
-          lv_obj_align(imgpair, nullptr, LV_ALIGN_CENTER, 0, -45);
+          lv_obj_align(imgpair, nullptr, LV_ALIGN_CENTER, -40, -15); 
 
-          tempCValue = lv_label_create(lv_scr_act(), nullptr);
+          /*tempCValue = lv_label_create(lv_scr_act(), nullptr);
           lv_obj_set_auto_realign(tempCValue, true);
           lv_label_set_text(tempCValue, "--");
           lv_label_set_style( tempCValue,LV_LABEL_STYLE_MAIN,&labelStyle);
           lv_obj_align( tempCValue,lv_scr_act(), LV_ALIGN_CENTER, 50, 33);
+          */
 
           tempFValue = lv_label_create(lv_scr_act(), nullptr);
           lv_obj_set_auto_realign(tempFValue, true);
           lv_label_set_text(tempFValue, "--");
           lv_label_set_style( tempFValue,LV_LABEL_STYLE_MAIN,&labelStyle);
-          lv_obj_align( tempFValue,lv_scr_act(), LV_ALIGN_CENTER, -50, 33);
+          lv_obj_align(tempFValue,lv_scr_act(), LV_ALIGN_CENTER, 60, -30);
+
 
           labelpoint  = lv_img_create(lv_scr_act(), NULL);  
           lv_img_set_src(labelpoint, &pointtemp);
@@ -520,27 +535,28 @@ Clock::Clock(DisplayApp* app,
 
           lableftemp  = lv_img_create(lv_scr_act(), nullptr);  
           lv_img_set_src(lableftemp , &ftemp);
-          lv_obj_align(lableftemp , nullptr, LV_ALIGN_CENTER, -50, 50);
+          lv_obj_align(lableftemp , nullptr, LV_ALIGN_CENTER, 61, 10);
 
 
-          lablectemp  = lv_img_create(lv_scr_act(), nullptr);  
+         /* lablectemp  = lv_img_create(lv_scr_act(), nullptr);  
           lv_img_set_src(lablectemp , &ctemp);
           lv_obj_align(lablectemp , nullptr, LV_ALIGN_CENTER, 50, 50);
+          */
+
           heartRateSensor.HrInit();
+
           timeoutCountStart = xTaskGetTickCount();
           rawTemp=35.5f + (rand()% 3)/10.0f ;
 
           textline1 = lv_label_create(lv_scr_act(), NULL);
-          lv_label_set_style(textline1, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_label_set_style(textline1, LV_LABEL_STYLE_MAIN, LabeltextStyle);
           lv_label_set_text(textline1, "Measurements not for"); 
-          lv_obj_align(textline1, NULL, LV_ALIGN_CENTER, 0, 75); 
+          lv_obj_align(textline1, NULL, LV_ALIGN_CENTER, 0, 65); 
 
           textline2 = lv_label_create(lv_scr_act(), NULL);
-          lv_label_set_style(textline2, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_label_set_style(textline2, LV_LABEL_STYLE_MAIN, LabeltextStyle);
           lv_label_set_text(textline2, "Medical Purposes"); 
-          lv_obj_align(textline2, NULL, LV_ALIGN_CENTER, 0, 95); 
-
-
+          lv_obj_align(textline2, NULL, LV_ALIGN_CENTER, 0, 85); 
 
           break;
         default:
@@ -550,7 +566,7 @@ Clock::Clock(DisplayApp* app,
 
 Clock::~Clock() {
   lv_obj_clean(lv_scr_act());
-  //app->SetTouchMode(DisplayApp::TouchModes::Gestures);
+  app->SetTouchMode(DisplayApp::TouchModes::Gestures);
   batteryController.setcheckVibrate(false);
   batteryController.setisButtonPushed(false);
   heartRateSensor.Disable(); 
@@ -573,8 +589,10 @@ bool Clock::Refresh() {
     else lv_img_set_src(batteryIcon, &battery_100);
     char strBat[4];
     sprintf (strBat, "%d", uint8_t(batteryPercent));
-    //bool isCharging = batteryController.IsCharging();//||batteryController.IsPowerPresent();
-    if(batteryController.IsCharging()){
+    bool isCharging = batteryController.IsCharging();//||batteryController.IsPowerPresent();
+    //if(batteryController.IsCharging())
+     if(isCharging)
+    {
       lv_obj_set_hidden(batteryPlug,false);
     } else lv_obj_set_hidden(batteryPlug,true);
 
@@ -763,7 +781,6 @@ bool Clock::Refresh() {
         lv_label_set_text(Zmax,strzmaxf); 
         lv_label_set_text(gwatch,strgf); 
 
- 
     break; 
     case Modes::Sensor:
         heartrate=heartRateSensor.ReadHr();
@@ -784,18 +801,18 @@ bool Clock::Refresh() {
           lv_label_set_text(tempCValue, strBat);
         } else flag++;
         
-        if(timeout>8*1024){ if(bleController.IsConnected()) app->SwichApp(0); else  app->SwichApp(7);}
+        if(timeout>6*1024){ if(bleController.IsConnected()) app->SwichApp(0); else  app->SwichApp(7);}
         break;
 
     case Modes::LowBattery:
         timeout=xTaskGetTickCount()-timeoutCountStart;
-        if(timeout>8*1024){ if(bleController.IsConnected()) app->SwichApp(0); else  app->SwichApp(7);}
+        if(timeout>6*1024){ if(bleController.IsConnected()) app->SwichApp(0); else  app->SwichApp(7);}
         break;
     case Modes::Oxi:
         char sp[4];
         spO2 = heartRateSensor.ReadSpO2();
         if(!checktemp) break;
-        if(mod>=700) {sprintf(sp, "%d%%",t); lv_label_set_text(heartbeatValue, sp);}
+        if(mod>=700) {sprintf(sp, "%d",t); lv_label_set_text(heartbeatValue, sp);lv_label_set_text(lablepercent,"%");}
         if(mod>701) break;
         t=98+rand()%2;
         mod++;      
@@ -804,7 +821,7 @@ bool Clock::Refresh() {
         lv_label_set_text(heartbeatValue, "--");
         else lv_label_set_text(heartbeatValue, "");
         }
-        else {sprintf(hr, "%d%%", spO2); lv_label_set_text(heartbeatValue, hr);}          
+        else {sprintf(hr, "%d", spO2); lv_label_set_text(heartbeatValue, hr);lv_label_set_text(lablepercent,"%");}          
     break;
     case Modes::Temp:
         heartrate=heartRateSensor.ReadHr();
@@ -814,17 +831,17 @@ bool Clock::Refresh() {
 
         if(!checktemp1){
             if(std::fmod(mod/5,5)) {
-              lv_label_set_text(tempCValue, "--");
+             // lv_label_set_text(tempCValue, "--");
               lv_label_set_text(tempFValue, "--");
             }
-            else {lv_label_set_text(tempCValue, "");
+            else {
+              //lv_label_set_text(tempCValue, "");
               lv_label_set_text(tempFValue, "");
             }          
         } else {       
        if((flag>180) && tempSensor.getIsCount()){
           flag=0;
-          //float rawTemp= tempSensor.Update();
-         
+          //float rawTemp= tempSensor.Update();      
            if(rawTemp<36.3){
            //if(timeout>20*1024) {rawTemp=rawTemp+(rand() % 4)/10.0f;}
           // else 
@@ -837,19 +854,16 @@ bool Clock::Refresh() {
             uint8_t tempInt1 = rawTemp;                  
             uint8_t tempInt2 = (rawTemp - tempInt1) * 10;  
             char strTemp[5];
-            sprintf (strTemp, "%d.%01d\n", tempInt1, tempInt2);    
-            lv_label_set_text(tempCValue,strTemp);    
+            //sprintf (strTemp, "%d.%01d\n", tempInt1, tempInt2);    
+            //lv_label_set_text(tempCValue,strTemp);    
             tempInt1 = 1.8f*rawTemp + 32;
             tempInt2 = (1.8f*rawTemp + 32 - tempInt1) * 10;
             sprintf (strTemp, "%d.%01d\n", tempInt1, tempInt2); 
             lv_label_set_text(tempFValue,strTemp);
+            lv_obj_align(tempFValue,lv_scr_act(), LV_ALIGN_CENTER, 60, -15);
           }
         }  
       } 
-
-
-
-
     break;
    default:
     break;
@@ -1045,6 +1059,6 @@ bool Clock::OnTouchEvent(uint16_t x, uint16_t y) {
         if(((x-120)*(x-120)+(y-155)*(y-155))<4900){
               checkTouchBigButton = true;
       } else checkTouchBigButton = false;
-  }
+  }  
   return false;
 }

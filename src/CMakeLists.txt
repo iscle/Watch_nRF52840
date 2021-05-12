@@ -476,9 +476,11 @@ list(APPEND SOURCE_FILES
         displayapp/LittleVgl.cpp
         #displayapp/fonts/jetbrains_mono_extrabold_compressed.c
         #displayapp/fonts/jetbrains_mono_bold_20.c
+        displayapp/fonts/San_Francisco_18.c
         displayapp/fonts/San_Francisco_50.c
         displayapp/fonts/San_Francisco_22.c
         displayapp/fonts/San_Francisco_30.c
+        displayapp/fonts/San_Francisco_40.c
         #displayapp/fonts/San_Francisco_Bold_18.c
         #displayapp/fonts/San_Francisco_Bold_20.c
         #displayapp/fonts/San_Francisco_Bold_50.c

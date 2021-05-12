@@ -53,6 +53,7 @@ namespace Watch {
         void ReadTempSensor();
         void ResetSensor();
         void CheckACC();
+        void CheckCommon();
         void CheckTracking();
         void CheckHeartbeat();
         void UpdateTimeOut(uint32_t timeout);
@@ -114,6 +115,7 @@ namespace Watch {
         uint8_t ble_notifyTimer =2;
         TimerHandle_t idleTimer;
         TimerHandle_t idleTimerAcc;
+        TimerHandle_t idleTimerCommon;
         TimerHandle_t idleTimerTracking;
         TimerHandle_t idleTimerHeartbeat;
         bool doNotGoToSleep = false;
@@ -125,7 +127,7 @@ namespace Watch {
       
         bool checkbright= false;
         uint8_t BrightDiscoveryTimer = 0;
-        uint8_t prehour=0;
+        uint8_t precheck=0;
         uint8_t checktime=0;
         uint8_t checknum =0;
         uint8_t preAlert =0;

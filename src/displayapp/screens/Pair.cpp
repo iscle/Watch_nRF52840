@@ -77,8 +77,6 @@ bool Pair::Refresh() {
 
 
 
-  
-
   return running;
 }
 

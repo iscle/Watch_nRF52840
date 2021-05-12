@@ -59,7 +59,7 @@ void Battery::SaadcInit() {
 void Battery::SaadcEventHandler(nrfx_saadc_evt_t const * p_event) {
 
     const float battery_max = 4.2; // maximum voltage of battery ( max charging voltage is 4.21 )
-    const float battery_min = 3.20; // minimum voltage of battery before shutdown ( depends on the battery )
+    const float battery_min = 3.60; // minimum voltage of battery before shutdown ( depends on the battery )
 
     if (p_event->type == NRFX_SAADC_EVT_DONE) {
       
@@ -210,6 +210,8 @@ z=_z;
 void Battery::setXmax(int8_t x){xmax=x;};
 void Battery::setYmax(int8_t y){ymax=y;};
 void Battery::setZmax(int8_t z){zmax=z;};
-
+void Battery::settouchx(int8_t x){touchx=x;};
+void Battery::settouchy(int8_t y){touchy=y;};
+void Battery::settouchaction(int8_t x){touchaction=x;};
 
 

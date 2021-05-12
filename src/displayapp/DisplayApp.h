@@ -50,6 +50,7 @@ namespace Watch {
         TaskHandle_t taskHandle;
         static void Process(void* instance);
         void InitHw();
+        void checkTouch();
         Watch::Drivers::St7789& lcd;
         Watch::Components::LittleVgl& lvgl;
         void Refresh();
@@ -81,6 +82,7 @@ namespace Watch {
         bool checkImpact = false ;
         bool checkCheckin =false;  
         std::unique_ptr<Screens::Modal> modal;
+        uint32_t mod = 0;
 
         Watch::Controllers::FirmwareValidator validator;
         TouchModes touchMode = TouchModes::Gestures;

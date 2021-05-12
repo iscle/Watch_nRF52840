@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(watch VERSION 0.14.5 LANGUAGES C CXX ASM)
+project(watch VERSION 0.14.7 LANGUAGES C CXX ASM)
 set(NRF_TARGET "nrf52840_xxaa")
 
 set(ARM_NONE_EABI_TOOLCHAIN_PATH ${CMAKE_CURRENT_SOURCE_DIR}/gcc-arm-none-eabi-9-2020-q2-update/)

@@ -9,6 +9,7 @@
 using namespace Watch::Components;
 
 extern "C" {
+LV_FONT_DECLARE(San_Francisco_18)
 LV_FONT_DECLARE(San_Francisco_22)
 LV_FONT_DECLARE(San_Francisco_50)
 LV_FONT_DECLARE(San_Francisco_30)
@@ -17,6 +18,7 @@ LV_FONT_DECLARE(San_Francisco_30)
 lv_style_t* LabelBigStyle = nullptr;
 lv_style_t* LabelSanStyle = nullptr;
 lv_style_t* LabelSmallStyle = nullptr;
+lv_style_t* LabeltextStyle = nullptr;
 
 
 static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p) {
@@ -376,6 +378,10 @@ lv_style_copy(&labelBigStyle, &prim);
   lv_style_copy(&labelSmallStyle, &prim);
   labelSmallStyle.text.font = &San_Francisco_30;
   LabelSmallStyle = &(this->labelSmallStyle);
+
+  lv_style_copy(&labeltextStyle, &prim);
+  labeltextStyle.text.font = &San_Francisco_18;
+  LabeltextStyle = &(this->labeltextStyle);
 
   sec.text.color = lv_color_hsv_to_rgb(hue, 15, 65);
 

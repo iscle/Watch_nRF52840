@@ -70,6 +70,7 @@ namespace Watch {
           lv_obj_t* checkButton;
           lv_obj_t* imgpair; 
           lv_obj_t* lablebpm;
+          lv_obj_t* lablepercent;
           lv_obj_t* lableftemp;
           lv_obj_t* lablectemp;
           lv_obj_t* lableleftCircle;

@@ -51,17 +51,19 @@ void DisplayApp::Start() {
 
 void DisplayApp::Process(void *instance) {
     auto *app = static_cast<DisplayApp *>(instance);
-    app->InitHw();
+    //app->InitHw();
     xTaskNotifyGive(xTaskGetCurrentTaskHandle());
     while (1) {
-      app->Refresh();
+      app->Refresh();   
   }
 }
 
 void DisplayApp::InitHw() {
 }
 
+
 void DisplayApp::Refresh() {
+
   TickType_t queueTimeout;
   switch (state) {
     case States::Idle:    
@@ -82,10 +84,11 @@ void DisplayApp::Refresh() {
       case Messages::GoToSleep:          
         //lcd.DisplayOff();
         systemTask.PushMessage(System::SystemTask::Messages::OnDisplayTaskSleeping);
+        SetTouchMode(DisplayApp::TouchModes::Gestures);
         state = States::Idle;
         break;
       case Messages::GoToRunning:         
-       // lcd.DisplayOn();           
+        //lcd.DisplayOn();           
         state = States::Running;
         break;
       case Messages::UpdateBleConnection: 
@@ -95,7 +98,7 @@ void DisplayApp::Refresh() {
         else SwichApp(7);           
         break;
       case Messages::TouchEvent: {
-        if (state != States::Running) break;
+        if (state != States::Running) break;        
         auto gesture = OnTouchEvent();
         if(!currentScreen->OnTouchEvent(gesture)) {
           switch (gesture) {
@@ -127,15 +130,16 @@ void DisplayApp::Refresh() {
       }
           break;
       case Messages::ButtonPushed:
+          nrf_gpio_pin_clear(2); 
           checkupdate = false;
           checkFall = false;
           checkImpact =false;
           checkCheckin =false;
-          batteryController.setDisturnOff(false);
-          nrf_gpio_pin_clear(2);               
-          appIndex=0;
+          batteryController.setDisturnOff(false);             
+          appIndex=0;          
           if(bleController.IsConnected()) SwichApp(0); else  SwichApp(7);
-          systemTask.PushMessage(System::SystemTask::Messages::GoToSleep); 
+          systemTask.PushMessage(System::SystemTask::Messages::GoToSleep);
+          //SetTouchMode(DisplayApp::TouchModes::Gestures); 
           break;
 
       case Messages::BleFirmwareUpdateStarted:
@@ -188,7 +192,7 @@ void DisplayApp::Refresh() {
           break;
     }
   }
-
+ 
   if(state != States::Idle && touchMode == TouchModes::Polling) {
     auto info = touchPanel.GetTouchInfo();
     if(info.action == 2) {// 2 = contact
@@ -196,7 +200,7 @@ void DisplayApp::Refresh() {
         lvgl.SetNewTapEvent(info.x, info.y);
       }
     }
-  }
+  } 
 }
 
 void DisplayApp::RunningState() { 
@@ -278,12 +282,12 @@ void DisplayApp::SwichApp(uint8_t app ){
         currentScreen.reset(new Screens::Clock(this, dateTimeController, batteryController, bleController, tempSensor,Screens::Clock::Modes::Sensor));
         break;
       case 3:
-       systemTask.UpdateTimeOut(40000);
+       systemTask.UpdateTimeOut(45000);
         //systemTask.PushMessage(System::SystemTask::Messages::AlwaysDisplay);
         currentScreen.reset(new Screens::Clock(this, dateTimeController, batteryController, bleController, tempSensor,Screens::Clock::Modes::Temp));
         break;
       case 4:
-       systemTask.UpdateTimeOut(40000);
+       systemTask.UpdateTimeOut(45000);
         //systemTask.PushMessage(System::SystemTask::Messages::AlwaysDisplay);
         currentScreen.reset(new Screens::Clock(this, dateTimeController, batteryController, bleController, tempSensor,Screens::Clock::Modes::Oxi));
         break;

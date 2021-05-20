@@ -170,7 +170,7 @@ Clock::Clock(DisplayApp* app,
 
         logo = lv_label_create(lv_scr_act(), NULL);
         lv_label_set_style(logo, LV_LABEL_STYLE_MAIN, LabelSanStyle);
-        lv_label_set_text(logo, "OEM Name"); 
+        lv_label_set_text(logo, "OEM Name 14.7.1"); 
         //lv_label_set_text(logo, "Zien Solutions"); 
         lv_obj_align(logo, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0, 5); 
 
@@ -318,7 +318,7 @@ Clock::Clock(DisplayApp* app,
 
           buttonSmall =  lv_icon_create(lv_scr_act(), &Okbutton);  
           lv_obj_align(buttonSmall, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 17);
-
+          /*
           x = lv_label_create(lv_scr_act(), NULL);
           lv_label_set_style(x, LV_LABEL_STYLE_MAIN, LabelSanStyle);
           lv_label_set_text(x, "0"); 
@@ -349,6 +349,7 @@ Clock::Clock(DisplayApp* app,
           lv_label_set_style(gwatch, LV_LABEL_STYLE_MAIN, LabelSanStyle);
           lv_label_set_text(gwatch, "0"); 
           lv_obj_align(gwatch, lv_scr_act(), LV_ALIGN_IN_RIGHT_MID, -45, 0);
+          */
           //app->SetTouchMode(DisplayApp::TouchModes::Polling); 
 
           break;
@@ -376,7 +377,7 @@ Clock::Clock(DisplayApp* app,
 
           buttonSmall =  lv_icon_create(lv_scr_act(), &Okbutton);  
           lv_obj_align(buttonSmall, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 17);
-
+          /*
           x = lv_label_create(lv_scr_act(), NULL);
           lv_label_set_style(x, LV_LABEL_STYLE_MAIN, LabelSanStyle);
           lv_label_set_text(x, "0"); 
@@ -407,6 +408,7 @@ Clock::Clock(DisplayApp* app,
           lv_label_set_style(gwatch, LV_LABEL_STYLE_MAIN, LabelSanStyle);
           lv_label_set_text(gwatch, "0"); 
           lv_obj_align(gwatch, lv_scr_act(), LV_ALIGN_IN_RIGHT_MID, -45, 0); 
+          */
           //app->SetTouchMode(DisplayApp::TouchModes::Polling);
 
           break;
@@ -566,7 +568,7 @@ Clock::Clock(DisplayApp* app,
 
 Clock::~Clock() {
   lv_obj_clean(lv_scr_act());
-  app->SetTouchMode(DisplayApp::TouchModes::Gestures);
+  //app->SetTouchMode(DisplayApp::TouchModes::Gestures);
   batteryController.setcheckVibrate(false);
   batteryController.setisButtonPushed(false);
   heartRateSensor.Disable(); 
@@ -589,9 +591,9 @@ bool Clock::Refresh() {
     else lv_img_set_src(batteryIcon, &battery_100);
     char strBat[4];
     sprintf (strBat, "%d", uint8_t(batteryPercent));
-    bool isCharging = batteryController.IsCharging();//||batteryController.IsPowerPresent();
-    //if(batteryController.IsCharging())
-     if(isCharging)
+    //bool isCharging = batteryController.IsCharging();//||batteryController.IsPowerPresent();
+    if(batteryController.IsCharging())
+     //if(batteryController.CheckCharging())
     {
       lv_obj_set_hidden(batteryPlug,false);
     } else lv_obj_set_hidden(batteryPlug,true);
@@ -694,7 +696,7 @@ bool Clock::Refresh() {
     timeout=xTaskGetTickCount()-timeoutCountStart;
     if(timeout<30*1024) { 
       if((batteryController.getimpactyy()==0x04) || batteryController.getisButtonPushed()) {
-        batteryController.setcheckVibrate(false); 
+        batteryController.setcheckVibrate(false);
       } else batteryController.setcheckVibrate(true);
       if(batteryController.getcheckVibrate()) batteryController.setIsVibrate(); 
     } else if((timeout<31*1024) && !batteryController.getisButtonPushed()) batteryController.setButtonData(0x13); 
@@ -711,7 +713,7 @@ bool Clock::Refresh() {
           lv_obj_set_hidden(lablerightCircle,true);
     }
     checkTouchBigButton = false;
-    char strx[6];
+/*    char strx[6];
     char stry[6];
     char strz[6];
     char strxmax[6];
@@ -733,7 +735,7 @@ bool Clock::Refresh() {
     lv_label_set_text(Ymax,strymax); 
     lv_label_set_text(Zmax,strzmax); 
     lv_label_set_text(gwatch,strg); 
-
+*/
 
     break; 
     case Modes::Fall:
@@ -757,7 +759,7 @@ bool Clock::Refresh() {
           lv_obj_set_hidden(lablerightCircle,true);
     }
     checkTouchBigButton = false;
-
+/*
         char strxf[6];
         char stryf[6];
         char strzf[6];
@@ -780,7 +782,7 @@ bool Clock::Refresh() {
         lv_label_set_text(Ymax,strymaxf); 
         lv_label_set_text(Zmax,strzmaxf); 
         lv_label_set_text(gwatch,strgf); 
-
+*/
     break; 
     case Modes::Sensor:
         heartrate=heartRateSensor.ReadHr();
@@ -1022,15 +1024,15 @@ void Clock::buttonEven(lv_obj_t *obj, Modes mode){
               batteryController.setButtonData(0x02);         
               batteryController.setcheckVibrate(false); 
               batteryController.setisButtonPushed(true);
-              //batteryController.setGoToSleep(true); 
-              batteryController.setXmax(0);
-              batteryController.setYmax(0);
-              batteryController.setZmax(0);     
+              batteryController.setGoToSleep(true); 
+              //batteryController.setXmax(0);
+              //batteryController.setYmax(0);
+              //batteryController.setZmax(0);     
           } else if(obj == buttonBig) {
               batteryController.setButtonData(0x13);     
               batteryController.setcheckVibrate(false);
               batteryController.setisButtonPushed(true); 
-              //batteryController.setGoToSleep(true);
+              batteryController.setGoToSleep(true);
           }
           break;
     case Modes::Fall:
@@ -1038,15 +1040,15 @@ void Clock::buttonEven(lv_obj_t *obj, Modes mode){
             batteryController.setButtonData(0x02); 
             batteryController.setcheckVibrate(false); 
             batteryController.setisButtonPushed(true); 
-            //batteryController.setGoToSleep(true);
-            batteryController.setXmax(0);
-            batteryController.setYmax(0);
-            batteryController.setZmax(0);       
+            batteryController.setGoToSleep(true);
+            //batteryController.setXmax(0);
+            //batteryController.setYmax(0);
+            //batteryController.setZmax(0);       
           } else if(obj == buttonBig) {
               batteryController.setButtonData(0x04);       
               batteryController.setcheckVibrate(false);
               batteryController.setisButtonPushed(true); 
-            //  batteryController.setGoToSleep(true);
+              batteryController.setGoToSleep(true);
           }
           break;
     default:

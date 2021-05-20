@@ -34,17 +34,17 @@ namespace Watch {
                   Modes mode
                   );
           ~Clock() override;
-
           bool Refresh() override;
           bool OnButtonPushed() override;
-
           void OnObjectEvent(lv_obj_t *pObj, lv_event_t i);
+          bool OnTouchEvent(TouchEvents event) override;
+          bool OnTouchEvent(uint16_t x, uint16_t y) override;
 
         private:
 
-          bool OnTouchEvent(TouchEvents event);
+         
           void buttonEven(lv_obj_t *obj, Modes mode);
-          bool OnTouchEvent(uint16_t x, uint16_t y) override;
+          
           static const char* MonthToString(Watch::Controllers::DateTime::Months month);
           static const char* DayOfWeekToString(Watch::Controllers::DateTime::Days dayOfWeek);
           static char const *DaysString[];
@@ -80,13 +80,14 @@ namespace Watch {
           lv_obj_t* labletopCircleSmall;
           lv_obj_t* lablerightCircleSmall;
           lv_obj_t* lablebottomCircleSmall;
-          lv_obj_t* Xmax; 
+         /* lv_obj_t* Xmax; 
           lv_obj_t* Ymax;
           lv_obj_t* Zmax;
           lv_obj_t* x;
           lv_obj_t* y;
           lv_obj_t* z;
           lv_obj_t* gwatch;
+          */
           lv_obj_t* textline1;
           lv_obj_t* textline2;
 

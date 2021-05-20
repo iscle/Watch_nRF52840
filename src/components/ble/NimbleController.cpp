@@ -142,15 +142,15 @@ void NimbleController::StartAdvertising() {
 int NimbleController::OnGAPEvent(ble_gap_event *event) {
   switch (event->type) {
     case BLE_GAP_EVENT_ADV_COMPLETE:
-      NRF_LOG_INFO("Advertising event : BLE_GAP_EVENT_ADV_COMPLETE");
-      NRF_LOG_INFO("advertise complete; reason=%dn status=%d", event->adv_complete.reason, event->connect.status);
+     // NRF_LOG_INFO("Advertising event : BLE_GAP_EVENT_ADV_COMPLETE");
+    //  NRF_LOG_INFO("advertise complete; reason=%dn status=%d", event->adv_complete.reason, event->connect.status);
       break;
     case BLE_GAP_EVENT_CONNECT: {
-      NRF_LOG_INFO("Advertising event : BLE_GAP_EVENT_CONNECT");
+    //  NRF_LOG_INFO("Advertising event : BLE_GAP_EVENT_CONNECT");
 
       /* A new connection was established or a connection attempt failed. */
-      NRF_LOG_INFO("connection %s; status=%d ", event->connect.status == 0 ? "established" : "failed",
-                   event->connect.status);
+    //  NRF_LOG_INFO("connection %s; status=%d ", event->connect.status == 0 ? "established" : "failed",
+     //              event->connect.status);
 
       if (event->connect.status != 0) {
         /* Connection failed; resume advertising. */
@@ -183,23 +183,23 @@ int NimbleController::OnGAPEvent(ble_gap_event *event) {
       break;
     case BLE_GAP_EVENT_ENC_CHANGE:
       /* Encryption has been enabled or disabled for this connection. */
-      NRF_LOG_INFO("encryption change event; status=%d ", event->enc_change.status);
+     // NRF_LOG_INFO("encryption change event; status=%d ", event->enc_change.status);
       return 0;
     case BLE_GAP_EVENT_SUBSCRIBE:
-      NRF_LOG_INFO("subscribe event; conn_handle=%d attr_handle=%d "
+    /*  NRF_LOG_INFO("subscribe event; conn_handle=%d attr_handle=%d "
                         "reason=%d prevn=%d curn=%d previ=%d curi=???\n",
                   event->subscribe.conn_handle,
                   event->subscribe.attr_handle,
                   event->subscribe.reason,
                   event->subscribe.prev_notify,
                   event->subscribe.cur_notify,
-                  event->subscribe.prev_indicate);
+                  event->subscribe.prev_indicate);*/
       return 0;
       case BLE_GAP_EVENT_MTU:
-     NRF_LOG_INFO("mtu update event; conn_handle=%d cid=%d mtu=%d\n",
+     /*NRF_LOG_INFO("mtu update event; conn_handle=%d cid=%d mtu=%d\n",
                   event->mtu.conn_handle,
                   event->mtu.channel_id,
-                  event->mtu.value);
+                  event->mtu.value);*/
       return 0;
     case BLE_GAP_EVENT_REPEAT_PAIRING: {
       /* We already have a bond with the peer, but it is attempting to
@@ -219,9 +219,9 @@ int NimbleController::OnGAPEvent(ble_gap_event *event) {
 
     case BLE_GAP_EVENT_NOTIFY_RX: {
       /* Peer sent us a notification or indication. */
-      size_t notifSize = OS_MBUF_PKTLEN(event->notify_rx.om);
+     // size_t notifSize = OS_MBUF_PKTLEN(event->notify_rx.om);
 
-      NRF_LOG_INFO("received %s; conn_handle=%d attr_handle=%d "
+    /*  NRF_LOG_INFO("received %s; conn_handle=%d attr_handle=%d "
                    "attr_len=%d",
                    event->notify_rx.indication ?
                    "indication" :
@@ -229,7 +229,7 @@ int NimbleController::OnGAPEvent(ble_gap_event *event) {
                    event->notify_rx.conn_handle,
                    event->notify_rx.attr_handle,
                    notifSize);
-
+*/
       //alertNotificationClient.OnNotification(event);
       return 0;
     }

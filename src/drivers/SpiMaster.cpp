@@ -25,6 +25,7 @@ bool SpiMaster::Init() {
   switch(spi) {
     case SpiModule::SPI0: spiBaseAddress = NRF_SPIM0; break;
     case SpiModule::SPI1: spiBaseAddress = NRF_SPIM1; break;
+    case SpiModule::SPI2: spiBaseAddress = NRF_SPIM2; break;
     default: return false;
   }
 
@@ -65,9 +66,14 @@ bool SpiMaster::Init() {
 
   spiBaseAddress->ENABLE = (SPIM_ENABLE_ENABLE_Enabled << SPIM_ENABLE_ENABLE_Pos);
 
+if(spi==SpiModule::SPI0){
   NRFX_IRQ_PRIORITY_SET(SPIM0_SPIS0_TWIM0_TWIS0_SPI0_TWI0_IRQn,2);
   NRFX_IRQ_ENABLE(SPIM0_SPIS0_TWIM0_TWIS0_SPI0_TWI0_IRQn);
-
+}
+else if(spi==SpiModule::SPI2){
+  NRFX_IRQ_PRIORITY_SET(SPIM2_SPIS2_SPI2_IRQn,2);
+  NRFX_IRQ_ENABLE(SPIM2_SPIS2_SPI2_IRQn);
+}
   xSemaphoreGive(mutex);
   return true;
 }

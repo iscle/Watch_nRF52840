@@ -210,8 +210,6 @@ z=_z;
 void Battery::setXmax(int8_t x){xmax=x;};
 void Battery::setYmax(int8_t y){ymax=y;};
 void Battery::setZmax(int8_t z){zmax=z;};
-void Battery::settouchx(int8_t x){touchx=x;};
-void Battery::settouchy(int8_t y){touchy=y;};
-void Battery::settouchaction(int8_t x){touchaction=x;};
+
 
 

@@ -9,7 +9,7 @@ ServiceDiscovery::ServiceDiscovery(std::array<BleClient*, 1>&& clients) : client
 }
 
 void ServiceDiscovery::StartDiscovery(uint16_t connectionHandle) {
-  NRF_LOG_INFO("[Discovery] Starting discovery");
+ // NRF_LOG_INFO("[Discovery] Starting discovery");
   clientIterator = clients.begin();
   DiscoverNextService(connectionHandle);
 }
@@ -19,12 +19,12 @@ void ServiceDiscovery::OnServiceDiscovered(uint16_t connectionHandle) {
   if(clientIterator != clients.end()) {
     DiscoverNextService(connectionHandle);
   } else {
-    NRF_LOG_INFO("End of service discovery");
+  //  NRF_LOG_INFO("End of service discovery");
   }
 }
 
 void ServiceDiscovery::DiscoverNextService(uint16_t connectionHandle) {
-  NRF_LOG_INFO("[Discovery] Discover next service");
+ // NRF_LOG_INFO("[Discovery] Discover next service");
 
   auto discoverNextService = [this](uint16_t connectionHandle){
     this->OnServiceDiscovered(connectionHandle);

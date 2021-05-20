@@ -76,9 +76,8 @@ namespace Watch {
         void checkinCharacteristic(uint8_t yy, uint8_t zz);
         void fallCharacteristic(uint8_t yy, uint8_t zz);
         void trackCharacteristic(uint8_t zz, uint8_t yy,uint8_t nn);
-        uint16_t gettouchx() {return touchx;};
-        uint16_t gettouchy() {return touchy;};
-        uint8_t gettouchaction() {return touchaction;};
+        uint8_t gettouchx() {return touchx;};
+        uint8_t gettouchy() {return touchy;};
         uint8_t gettimetracking(){return timetracking;}
         uint8_t getnumtracking(){return numtracking;}
         uint8_t gettimeheartbeat(){return timeheartbeat;}
@@ -95,10 +94,6 @@ namespace Watch {
         int8_t getxmax() { return xmax;};
         int8_t getymax() { return ymax;};
         int8_t getzmax() { return zmax;};
-        void settouchx(int8_t x);
-        void settouchy(int8_t y);
-        void settouchaction(int8_t x);
-
 
 
 
@@ -129,7 +124,7 @@ namespace Watch {
         uint8_t fallHighpeak=0x35;
         uint8_t fallLowpeak=0x25;
         uint8_t falltime=0x03;
-        uint8_t fallyy=0x02;
+        uint8_t fallyy=0x01;
         uint8_t CheckinTime1 =0x00;
         uint8_t CheckinTime2 =0x00;
         bool isTimer1Start = false;
@@ -161,7 +156,6 @@ namespace Watch {
         int8_t xmax =0;
         int8_t ymax=0;
         int8_t zmax=0;
-        uint8_t touchaction = 0;
        
     };
   }

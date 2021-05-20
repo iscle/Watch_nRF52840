@@ -241,7 +241,7 @@ void TwiMaster::Sleep() {
   }
   nrf_gpio_cfg_default(6);
   nrf_gpio_cfg_default(7);
-  NRF_LOG_INFO("[TWIMASTER] Sleep");
+  //NRF_LOG_INFO("[TWIMASTER] Sleep");
 }
 
 void TwiMaster::Sleep1() {
@@ -250,13 +250,13 @@ void TwiMaster::Sleep1() {
   }
   nrf_gpio_cfg_default(12);
   nrf_gpio_cfg_default(13);
-  NRF_LOG_INFO("[TWIMASTER] Sleep");
+ // NRF_LOG_INFO("[TWIMASTER] Sleep");
 }
 
 
 void TwiMaster::Wakeup() {
   Init();
-  NRF_LOG_INFO("[TWIMASTER] Wakeup");
+//  NRF_LOG_INFO("[TWIMASTER] Wakeup");
 }
 
 /* Sometimes, the TWIM device just freeze and never set the event EVENTS_LASTTX.
@@ -265,7 +265,7 @@ void TwiMaster::Wakeup() {
  * this issue from happening.
  * */
 void TwiMaster::FixHwFreezed() {
-  NRF_LOG_INFO("I2C device frozen, reinitializing it!");
+ // NRF_LOG_INFO("I2C device frozen, reinitializing it!");
   // Disable I²C
   uint32_t twi_state = NRF_TWI1->ENABLE;
   twiBaseAddress->ENABLE = TWIM_ENABLE_ENABLE_Disabled << TWI_ENABLE_ENABLE_Pos;

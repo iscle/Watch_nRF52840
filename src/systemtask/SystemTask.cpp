@@ -26,7 +26,6 @@ void IdleTimerAccCallback(TimerHandle_t xTimer) {
   auto sysTask = static_cast<SystemTask *>(pvTimerGetTimerID(xTimer));
   sysTask->CheckACC();
 }
-
 void IdleTimerCommonCallback(TimerHandle_t xTimer) {
   auto sysTask = static_cast<SystemTask *>(pvTimerGetTimerID(xTimer));
   sysTask->CheckCommon();
@@ -74,7 +73,7 @@ void SystemTask::Process(void *instance) {
 }
 
 void SystemTask::Work() {
-  watchdog.Setup(4);
+  watchdog.Setup(5);
   watchdog.Start();
   APP_GPIOTE_INIT(2);
 
@@ -91,7 +90,6 @@ void SystemTask::Work() {
   batteryController.Update();
   heartRateSensor.Enable();
   tempSensor.Init(); 
-  //motionSensor.SoftReset();
   motionSensor.Init();
 
   displayApp = std::make_unique<Watch::Applications::DisplayApp>(lcd, lvgl, touchPanel, batteryController, bleController,
@@ -104,33 +102,33 @@ void SystemTask::Work() {
   pinConfig.hi_accuracy = false;
   pinConfig.is_watcher = false;
   pinConfig.sense = (nrf_gpiote_polarity_t)NRF_GPIOTE_POLARITY_HITOLO;
-  pinConfig.pull = (nrf_gpio_pin_pull_t)GPIO_PIN_CNF_PULL_Pulldown;
+  pinConfig.pull = (nrf_gpio_pin_pull_t)GPIO_PIN_CNF_PULL_Pullup;
   nrfx_gpiote_in_init(pinButton, &pinConfig, nrfx_gpiote_evt_handler);
 
   nrf_gpio_cfg_sense_input(pinTouchIrq, (nrf_gpio_pin_pull_t)GPIO_PIN_CNF_PULL_Pullup, (nrf_gpio_pin_sense_t)GPIO_PIN_CNF_SENSE_Low);
   pinConfig.pull = (nrf_gpio_pin_pull_t)GPIO_PIN_CNF_PULL_Pullup;
   nrfx_gpiote_in_init(pinTouchIrq, &pinConfig, nrfx_gpiote_evt_handler); 
-
   
   idleTimer = xTimerCreate ("idleTimer", pdMS_TO_TICKS(25000), pdFALSE, this, IdleTimerCallback);
-  idleTimerAcc = xTimerCreate ("idleTimerAcc", pdMS_TO_TICKS(150), pdTRUE, this, IdleTimerAccCallback);
-  idleTimerCommon = xTimerCreate ("idleTimerCommon", pdMS_TO_TICKS(550), pdTRUE, this, IdleTimerCommonCallback);
+  idleTimerAcc = xTimerCreate ("idleTimerAcc", pdMS_TO_TICKS(80), pdTRUE, this, IdleTimerAccCallback);
+  idleTimerCommon = xTimerCreate ("idleTimerCommon", pdMS_TO_TICKS(600), pdTRUE, this, IdleTimerCommonCallback);
   idleTimerTracking = xTimerCreate ("idleTimerAcc", pdMS_TO_TICKS(60000), pdTRUE, this, IdleTimerTrackingCallback);
   idleTimerHeartbeat = xTimerCreate ("idleTimerHeartbeat", pdMS_TO_TICKS(60000), pdTRUE, this, IdleTimerHeartbeatCallback);
   xTimerStart(idleTimer, 0);
   xTimerStart(idleTimerAcc, 0);
-  xTimerStart(idleTimerCommon, 0);
-    
+  xTimerStart(idleTimerCommon, 0);  
+  
   // Suppress endless loop diagnostic
   #pragma clang diagnostic push
   #pragma ide diagnostic ignored "EndlessLoop"
   while(true) {
     uint8_t msg;
-   // if (xQueueReceive(systemTasksMsgQueue, &msg, isSleeping ? 2500 : 1000)){ 
-      if (xQueueReceive(systemTasksMsgQueue, &msg, 100)) {        
+    if (xQueueReceive(systemTasksMsgQueue, &msg, isSleeping ? 2000 : 800)){ 
+    //  if (xQueueReceive(systemTasksMsgQueue, &msg, 500)) {        
       Messages message = static_cast<Messages >(msg); 
       switch(message) {
-        case Messages::GoToRunning:        
+        case Messages::GoToRunning: 
+          //runACC= false;       
           //spi.Wakeup();
           //twiMaster.Wakeup();
           nimbleController.StartAdvertising();
@@ -138,29 +136,33 @@ void SystemTask::Work() {
           //spiNorFlash.Wakeup();
           //touchPanel.Wakeup();
           lcd.Wakeup();  
-          //motionSensor.Init();                
+          motionSensor.Init();                
           displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::GoToRunning);
           isSleeping = false;
-          isWakingUp = false;        
-         
+          isWakingUp = false; 
+          //runACC= true;        
           break;
         case Messages::GoToSleep:
-          isGoingToSleep = true;
+          //runACC= false; 
           xTimerStop(idleTimer, 0);
+          isGoingToSleep = true;
           displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::Clock);
           displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::GoToSleep);
-         // displayApp->SetTouchMode(Watch::Applications::DisplayApp::TouchModes::Gestures);
-          heartRateSensor.Disable();           
+          heartRateSensor.Disable(); 
+          //runACC= true; 
           break;
         case Messages::BleConnected:
           ReloadIdleTimer();
-          nimbleController.StartDiscovery(); 
-          if(isSleeping) GoToRunning();  
-          displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::UpdateBleConnection); 
-               
+          nimbleController.StartDiscovery();
+          motionSensor.Init(); 
+          if(isSleeping) GoToRunning(); 
+          displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::UpdateBleConnection);  
+          //if(bleController.IsConnected()) xTimerStart(idleTimerAcc, 0); else xTimerStop(idleTimerAcc, 0);              
           break;
         case Messages::BleFirmwareUpdateStarted:
           batteryController.setGoToSleep(false);
+          //xTimerStop(idleTimerAcc, 0);
+          //runACC= false;
           if(isSleeping) GoToRunning();
           displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::BleFirmwareUpdateStarted);
           break;
@@ -191,12 +193,13 @@ void SystemTask::Work() {
           break;
         case Messages::OnButtonEvent:
           batteryController.setGoToSleep(true);
+          GoToRunning();
           checkcharging = true; 
           if(batteryController.IsCharging() && checkcharging)    
-                {
-                  displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::Charging); 
-                  checkcharging = false;  
-                } else         
+            {
+              displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::Charging); 
+              checkcharging = false;  
+            } else                  
           displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::Clock);
           ReloadIdleTimer();
           break;
@@ -205,15 +208,19 @@ void SystemTask::Work() {
           xTimerStart(idleTimer, 0);
           break;
         case Messages::OnDisplayTaskSleeping:         
-          //spiNorFlash.Sleep();          
+          //spiNorFlash.Sleep();
+          //xTimerStop(idleTimerAcc, 0);  
+          //runACC= false;
+          //lcd.DisplayOff();       
           lcd.Sleep();         
           //touchPanel.Sleep();
           //spi.Sleep();
           //twiMaster.Sleep();
-          //motionSensor.SoftReset();
           displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::Clock);
           isSleeping = true;
           isGoingToSleep = false;
+          //runACC= true;
+          //xTimerStart(idleTimerAcc, 0);
           break;
         default: break;
       }
@@ -237,7 +244,7 @@ void SystemTask::Work() {
       }
       preAlert= batteryController.getIsAlert();
     }
-    
+
     uint32_t systick_counter = nrf_rtc_counter_get(portNRF_RTC_REG);
     dateTimeController.UpdateTime(systick_counter);
     if(nrf_gpio_pin_read(pinButton))  watchdog.Kick();
@@ -245,39 +252,30 @@ void SystemTask::Work() {
   #pragma clang diagnostic pop
 }
 
-
 void SystemTask::OnButtonPushed() {
-      
+  checkcharging = true;     
   if(isGoingToSleep) return;
   if(!isSleeping) {
-    nrf_gpio_pin_clear(2); 
     PushMessage(Messages::OnButtonEvent);
     displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::ButtonPushed);
   }
   else {
     if(!isWakingUp) {
-      GoToRunning(); 
-      checkcharging = true;  
+      GoToRunning();  
     }
   }
 }
 
 void SystemTask::GoToRunning() {
   if(isGoingToSleep || (!isSleeping) ||isWakingUp) return;
+  //if(isGoingToSleep || (!isSleeping)) return;
   isWakingUp = true;
   PushMessage(Messages::GoToRunning);
 }
 
 void SystemTask::OnTouchEvent() {
-  //PushMessage(Messages::OnTouchEvent);
-  //displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::TouchEvent);
-  if (isGoingToSleep)return;
-  if (!isSleeping) {
-    PushMessage(Messages::OnTouchEvent);
-    displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::TouchEvent);
-  } else if (!isWakingUp) {
-   PushMessage(Messages::OnTouchEvent);
-  }
+  PushMessage(Messages::OnTouchEvent);
+  displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::TouchEvent);
 }
 
 void SystemTask::PushMessage(SystemTask::Messages msg) {
@@ -293,9 +291,8 @@ void SystemTask::PushMessage(SystemTask::Messages msg) {
 
 void SystemTask::OnIdle() {
   if(doNotGoToSleep) return;
-  nrf_gpio_pin_clear(2);  
+  nrf_gpio_pin_clear(2);
   displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::Clock);
- // displayApp->SetTouchMode(Watch::Applications::DisplayApp::TouchModes::Gestures);
   PushMessage(Messages::GoToSleep);
 }
 
@@ -303,7 +300,6 @@ void SystemTask::ReloadIdleTimer() const {
   if(isSleeping || isGoingToSleep) return;
   xTimerReset(idleTimer, 0);
 }
-
 void SystemTask::ReadTempSensor() {
   if(tempSensor.getIsCount()==0)
   {
@@ -321,51 +317,53 @@ void SystemTask::ReadTempSensor() {
 
 void SystemTask::CheckACC() { 
 if(bleController.IsConnected()) {
+    //Test//
+ /* if((batteryController.getfallyy()!=0x02)||(batteryController.getimpactyy()!=0x02)){
+    batteryController.setAccData(motionSensor.Process());
+    auto xyz =motionSensor.ProcessTest();
+    batteryController.setxyz(xyz.x,xyz.y,xyz.z);
+    batteryController.setXmax(std::max(abs(xyz.x),abs(batteryController.getxmax())));
+    batteryController.setYmax(std::max(abs(xyz.y),abs(batteryController.getymax())));
+    batteryController.setZmax(std::max(abs(xyz.z),abs(batteryController.getzmax())));
+  }
+  */
+  //////////////////////
+  if(motionSensor.Process()>batteryController.getfallHighpeak()) {isHandDiscoveryTimerRunning =true;}
+  if(motionSensor.Process()>batteryController.getimpactzz()) {isImpactDiscoveryTimerRunning =true;}
+  if(isHandDiscoveryTimerRunning) HandDiscoveryTimer++;
 
-  if(batteryController.getfallyy()!=0x02) {
-    if(motionSensor.Process()>batteryController.getfallHighpeak()) {isHandDiscoveryTimerRunning =true;}
-    if(isHandDiscoveryTimerRunning) HandDiscoveryTimer++;
-    if(HandDiscoveryTimer>batteryController.getfalltime()*12) {
-        isHandDiscoveryTimerRunning =false;
-        HandDiscoveryTimer=0;
-    }
+  if(HandDiscoveryTimer>batteryController.getfalltime()*12) {
+    isHandDiscoveryTimerRunning =false;
+    HandDiscoveryTimer=0;
+}
+
+    if(batteryController.getfallyy()!=0x02) {
       if(((HandDiscoveryTimer==batteryController.getfalltime()*10)&&(motionSensor.Process()<batteryController.getfallLowpeak()))||(batteryController.getfallyy()==0x07)){
+        if(isSleeping) GoToRunning();
         displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::Fall);
          batteryController.setfallyy(0x01);
          isHandDiscoveryTimerRunning =false;
          isImpactDiscoveryTimerRunning= false;
          HandDiscoveryTimer=0;
-         if(isSleeping) GoToRunning();
          return;
       }
     }
  
-  if(batteryController.getimpactyy()!=0x02) {
-    if(motionSensor.Process()>batteryController.getimpactzz()) {isImpactDiscoveryTimerRunning =true;}
+  if((batteryController.getimpactyy()!=0x02) ) {
       if((isImpactDiscoveryTimerRunning && !isHandDiscoveryTimerRunning)|| (batteryController.getimpactyy()==0x05)){
+        if(isSleeping) GoToRunning();
         displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::Impact);
         batteryController.setimpactyy(0x01);
         isImpactDiscoveryTimerRunning= false;
-        if(isSleeping) GoToRunning();
         return;
       }
-  }
-
-  if((batteryController.getfallyy()!=0x02) ||(batteryController.getimpactyy()!=0x02)){
-      batteryController.setAccData(motionSensor.Process());
-      auto xyz =motionSensor.ProcessTest();
-      batteryController.setxyz(xyz.x,xyz.y,xyz.z);
-      batteryController.setXmax(std::max(abs(xyz.x),abs(batteryController.getxmax())));
-      batteryController.setYmax(std::max(abs(xyz.y),abs(batteryController.getymax())));
-      batteryController.setZmax(std::max(abs(xyz.z),abs(batteryController.getzmax())));
-    }
+    } 
 }
- /* if(isSleeping){
+    if(isSleeping){
       if(motionSensor.Process()>1.3) checkbright=true;
-      if(checkbright) BrightDiscoveryTimer++;
-      if((BrightDiscoveryTimer==10) && (motionSensor.Process()<1.2)) { GoToRunning();BrightDiscoveryTimer=0;checkbright=false;}
+    //if(checkbright) BrightDiscoveryTimer++;
+    //if((BrightDiscoveryTimer==10) && (motionSensor.Process()<1.2)) { BrightDiscoveryTimer=0;checkbright=false;}
     }
- */   
 }
 
 void SystemTask::CheckCommon(){
@@ -386,16 +384,15 @@ void SystemTask::CheckCommon(){
     }
 }
 
-
 void SystemTask::CheckTracking(){
-    if((checknum==batteryController.getnumtracking()) || !batteryController.Istracking()|| (batteryController.getIsAlert()==0x02)){
+      if((checknum==batteryController.getnumtracking()) || !batteryController.Istracking()|| (batteryController.getIsAlert()==0x02)){
         xTimerStop(idleTimerTracking, 0);
         checktime=0;
         checknum=0;
         return;
      }
       checktime++;
-    if(checktime==batteryController.gettimetracking()){
+      if(checktime==batteryController.gettimetracking()){
       batteryController.setButtonDataNoVibrate(0x07);
       checktime=0;
       checknum++;
@@ -423,7 +420,6 @@ void SystemTask::CheckLowbattery(){
     if((batteryController.PercentRemaining()>35)&& batteryController.IsCharging()) checklowbattery = false;
 }
 
-
 void SystemTask::CheckCheckIn(){
     uint8_t hour = dateTimeController.Hours();
     uint8_t minute = dateTimeController.Minutes();
@@ -440,7 +436,6 @@ void SystemTask::CheckCheckIn(){
           if (batteryController.isTimerStart2()) batteryController.setisTimer2Display(false) ;   
      }
 }
-
 
 void SystemTask::UpdateTimeOut(uint32_t timeout){
     xTimerChangePeriod(idleTimer, pdMS_TO_TICKS(timeout), 0);

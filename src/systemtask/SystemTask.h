@@ -48,7 +48,6 @@ namespace Watch {
 
         void OnButtonPushed();
         void OnTouchEvent();
-
         void OnIdle();
         void ReadTempSensor();
         void ResetSensor();
@@ -82,12 +81,12 @@ namespace Watch {
           Watch::Drivers::WatchdogView watchdogView;
           Watch::Controllers::NotificationManager& notificationManager;
           Watch::Drivers::Acnt101& tempSensor;
-          Watch::Drivers::Acnt101Adc tempSensorAdc;
+          //Watch::Drivers::Acnt101Adc tempSensorAdc;
           //Watch::Drivers::Kx022& motionSensor;
           Watch::Drivers::Kx126& motionSensor;
           Watch::Controllers::NimbleController nimbleController;   
-          Watch::Drivers::VchR02 heartRateSensor;           
-  
+          Watch::Drivers::VchR02 heartRateSensor;    
+
         static constexpr uint8_t pinSpiSck = 16;
         static constexpr uint8_t pinSpiMosi = 14;
         static constexpr uint8_t pinSpiMiso = 15;
@@ -127,14 +126,15 @@ namespace Watch {
       
         bool checkbright= false;
         uint8_t BrightDiscoveryTimer = 0;
-        uint8_t precheck=0;
+        uint8_t prehour=0;
         uint8_t checktime=0;
         uint8_t checknum =0;
         uint8_t preAlert =0;
         bool checkheartbeat = true;
         uint8_t checktimeheart=0;
         uint8_t checknumheart =0;
-        float accValue=0;
+       //float accValue=0;
+        //bool runACC = true;
      
 /*
 #if configUSE_TRACE_FACILITY == 1

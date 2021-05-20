@@ -65,10 +65,14 @@ if (ctxt->op == BLE_GATT_ACCESS_OP_WRITE_CHR) {
                         break;
                         case 6:
                                 batteryController.impactCharacteristic(result.zz, result.yy);
+                        break;                    
+                        case 9:
+                                NVIC_SystemReset();
                         break;
                         default :
                                 batteryController.trackCharacteristic(result.zz, result.yy,result.nn);
                         break;
+                       
                   }
                 
 } else if (ctxt->op == BLE_GATT_ACCESS_OP_READ_CHR) {                 

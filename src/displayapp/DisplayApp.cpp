@@ -51,19 +51,17 @@ void DisplayApp::Start() {
 
 void DisplayApp::Process(void *instance) {
     auto *app = static_cast<DisplayApp *>(instance);
-    //app->InitHw();
+    app->InitHw();
     xTaskNotifyGive(xTaskGetCurrentTaskHandle());
     while (1) {
-      app->Refresh();   
+      app->Refresh();
   }
 }
 
 void DisplayApp::InitHw() {
 }
 
-
 void DisplayApp::Refresh() {
-
   TickType_t queueTimeout;
   switch (state) {
     case States::Idle:    
@@ -71,7 +69,7 @@ void DisplayApp::Refresh() {
       break;
     case States::Running:
       RunningState();
-      queueTimeout = 20;
+      queueTimeout = 150;
       break;
     default:
       queueTimeout = portMAX_DELAY;
@@ -84,7 +82,6 @@ void DisplayApp::Refresh() {
       case Messages::GoToSleep:          
         //lcd.DisplayOff();
         systemTask.PushMessage(System::SystemTask::Messages::OnDisplayTaskSleeping);
-        SetTouchMode(DisplayApp::TouchModes::Gestures);
         state = States::Idle;
         break;
       case Messages::GoToRunning:         
@@ -92,16 +89,20 @@ void DisplayApp::Refresh() {
         state = States::Running;
         break;
       case Messages::UpdateBleConnection: 
+        checkupdate = false;
+        checkFall = false;
+        checkImpact =false;
+        checkCheckin =false;    
         batteryController.setIsVibrate();
         validator.Validate();     
         if(bleController.IsConnected()) { SwichApp(1);   appIndex =1; }          
         else SwichApp(7);           
         break;
       case Messages::TouchEvent: {
-        if (state != States::Running) break;        
+        if (state != States::Running) break;
         auto gesture = OnTouchEvent();
         if(!currentScreen->OnTouchEvent(gesture)) {
-          switch (gesture) {
+          switch(gesture) {
           /* case TouchEvents::SwipeDown:             
              SwichApp(6);              
               break;
@@ -130,16 +131,15 @@ void DisplayApp::Refresh() {
       }
           break;
       case Messages::ButtonPushed:
-          nrf_gpio_pin_clear(2); 
           checkupdate = false;
           checkFall = false;
           checkImpact =false;
           checkCheckin =false;
-          batteryController.setDisturnOff(false);             
-          appIndex=0;          
+          batteryController.setDisturnOff(false);
+          nrf_gpio_pin_clear(2);               
+          appIndex=0;
           if(bleController.IsConnected()) SwichApp(0); else  SwichApp(7);
-          systemTask.PushMessage(System::SystemTask::Messages::GoToSleep);
-          //SetTouchMode(DisplayApp::TouchModes::Gestures); 
+          systemTask.PushMessage(System::SystemTask::Messages::GoToSleep); 
           break;
 
       case Messages::BleFirmwareUpdateStarted:
@@ -151,7 +151,7 @@ void DisplayApp::Refresh() {
           break;
 
       case Messages::Impact:
-          batteryController.setDisturnOff(true);
+          //batteryController.setDisturnOff(true);
           checkImpact= true;
           batteryController.setButtonData(0x12); 
           batteryController.setIsAlert(0x12); 
@@ -161,7 +161,7 @@ void DisplayApp::Refresh() {
 
       case Messages::Fall: 
           checkFall = true;
-          batteryController.setDisturnOff(true);
+          //batteryController.setDisturnOff(true);
           batteryController.setButtonData(0x08);
           batteryController.setIsAlert(0x08); 
           systemTask.PushMessage(System::SystemTask::Messages::AlwaysDisplay);     
@@ -192,7 +192,7 @@ void DisplayApp::Refresh() {
           break;
     }
   }
- 
+
   if(state != States::Idle && touchMode == TouchModes::Polling) {
     auto info = touchPanel.GetTouchInfo();
     if(info.action == 2) {// 2 = contact
@@ -200,7 +200,7 @@ void DisplayApp::Refresh() {
         lvgl.SetNewTapEvent(info.x, info.y);
       }
     }
-  } 
+  }
 }
 
 void DisplayApp::RunningState() { 
@@ -234,10 +234,11 @@ TouchEvents DisplayApp::OnTouchEvent() {
         return TouchEvents::SwipeRight;
       case Watch::Drivers::Cst816S::Gestures::SlideLeft:
         return TouchEvents::SwipeLeft;
-      case Watch::Drivers::Cst816S::Gestures::SlideDown:
+     /* case Watch::Drivers::Cst816S::Gestures::SlideDown:
         return TouchEvents::SwipeDown;
       case Watch::Drivers::Cst816S::Gestures::SlideUp:
         return TouchEvents::SwipeUp;
+        */
       case Watch::Drivers::Cst816S::Gestures::None:
       default:
         return TouchEvents::None;
@@ -256,8 +257,8 @@ void DisplayApp::SetTouchMode(DisplayApp::TouchModes mode) {
 
 
 void DisplayApp::SwichApp(uint8_t app ){    
-    currentScreen.reset(nullptr); 
-    currentScreen.reset(nullptr);
+    //currentScreen.reset(nullptr); 
+    //currentScreen.reset(nullptr);
     currentScreen.reset(nullptr);
     onClockApp = true;
     switch (app)
@@ -292,9 +293,11 @@ void DisplayApp::SwichApp(uint8_t app ){
         currentScreen.reset(new Screens::Clock(this, dateTimeController, batteryController, bleController, tempSensor,Screens::Clock::Modes::Oxi));
         break;
       case 5:
+       systemTask.UpdateTimeOut(50000);
         currentScreen.reset(new Screens::Clock(this, dateTimeController, batteryController, bleController, tempSensor, Screens::Clock::Modes::Impact));
         break;
       case 6:
+       systemTask.UpdateTimeOut(50000);
         currentScreen.reset(new Screens::Clock(this, dateTimeController, batteryController, bleController, tempSensor, Screens::Clock::Modes::Fall));
         break;
       //case 6:

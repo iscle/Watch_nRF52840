@@ -119,6 +119,7 @@ void DebounceTimerCallback(TimerHandle_t xTimer) {
   systemTask->OnButtonPushed();
 }
 
+extern "C" {
 void SPIM0_SPIS0_TWIM0_TWIS0_SPI0_TWI0_IRQHandler(void) {
   if(((NRF_SPIM0->INTENSET & (1<<6)) != 0) && NRF_SPIM0->EVENTS_END == 1) {
     NRF_SPIM0->EVENTS_END = 0;
@@ -133,8 +134,8 @@ void SPIM0_SPIS0_TWIM0_TWIS0_SPI0_TWI0_IRQHandler(void) {
   if(((NRF_SPIM0->INTENSET & (1<<1)) != 0) && NRF_SPIM0->EVENTS_STOPPED == 1) {
     NRF_SPIM0->EVENTS_STOPPED = 0;
   }
+  }
 }
-
 static void (*radio_isr_addr)(void) ;
 static void (*rng_isr_addr)(void) ;
 static void (*rtc0_isr_addr)(void) ;

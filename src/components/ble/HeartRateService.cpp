@@ -57,7 +57,7 @@ void HeartRateService::Init() {
 int HeartRateService::OnHeartRateRequested(uint16_t connectionHandle, uint16_t attributeHandle,
                                            ble_gatt_access_ctxt *context) {
   if(attributeHandle == heartRateMeasurementHandle) {
-    NRF_LOG_INFO("BATTERY : handle = %d", heartRateMeasurementHandle);
+   // NRF_LOG_INFO("BATTERY : handle = %d", heartRateMeasurementHandle);
     //static uint8_t batteryValue = heartRateController.HeartRate();
 
     uint8_t buffer[2] = {0, heartRateController.HeartRate()}; // [0] = flags, [1] = hr value

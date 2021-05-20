@@ -41,9 +41,8 @@ void St7789::WriteData(uint8_t data) {
   WriteSpi(&data, 1);
 }
 
-
 void St7789::WriteSpi(const uint8_t* data, size_t size) {
-    spi.Write(data, size);
+  spi.Write(data, size);
 }
 
 void St7789::SoftwareReset() {
@@ -67,26 +66,23 @@ void St7789::ColMod() {
 
 void St7789::MemoryDataAccessControl() {
   WriteCommand(static_cast<uint8_t>(Commands::MemoryDataAccessControl));
-  //WriteData(0x00);
-   WriteData(Orientation_180);
+  WriteData(Orientation_180);
 }
 
 void St7789::ColumnAddressSet() {
   WriteCommand(static_cast<uint8_t>(Commands::ColumnAddressSet));
+  WriteData(0x00);
+  WriteData(0x00);
   WriteData(Width >> 8u);
   WriteData(Width & 0xffu);
-  WriteData(0x00);
-  WriteData(0x00);
-
 }
 
 void St7789::RowAddressSet() {
   WriteCommand(static_cast<uint8_t>(Commands::RowAddressSet));
-  WriteData(240u >> 8u);
-  WriteData(240u & 0xffu);
   WriteData(0x00);
   WriteData(0x00);
-
+  WriteData(320u >> 8u);
+  WriteData(320u & 0xffu);
 }
 
 void St7789::DisplayInversionOn() {
@@ -112,7 +108,7 @@ void St7789::SetAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
   WriteData(x1 & 0xff);
 
   WriteCommand(static_cast<uint8_t>(Commands::RowAddressSet));
-  WriteData(y0>>8);
+  WriteData(y0 >> 8);
   WriteData(y0 & 0xff);
   WriteData(y1 >> 8);
   WriteData(y1 & 0xff);
@@ -125,9 +121,9 @@ void St7789::WriteToRam() {
 }
 
 void St7789::DisplayOff() {
-  nrf_gpio_pin_clear(2);
   WriteCommand(static_cast<uint8_t>(Commands::DisplayOff));
-  nrf_delay_ms(10);
+  nrf_delay_ms(500);
+  nrf_gpio_pin_clear(2);
 }
 
 void St7789::VerticalScrollDefinition(uint16_t topFixedLines, uint16_t scrollLines, uint16_t bottomFixedLines) {
@@ -184,8 +180,11 @@ void St7789::HardwareReset() {
 
 void St7789::Sleep() {
   nrf_gpio_pin_clear(2);
+  nrf_gpio_cfg_output(pinDataCommand);
+  HardwareReset();
+  SoftwareReset();
+  DisplayOff();
   SleepIn();
-  nrf_gpio_cfg_default(pinDataCommand);  
   //NRF_LOG_INFO("[LCD] Sleep");
 }
 

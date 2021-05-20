@@ -488,6 +488,7 @@ list(APPEND SOURCE_FILES
         displayapp/screens/creatsymbol.c
 
         systemtask/SystemTask.cpp
+        systemtask/SystemMonitor.h
         drivers/TwiMaster.cpp
         #heartratetask/HeartRateTask.cpp
         #components/heartrate/Ppg.cpp
@@ -565,8 +566,6 @@ list(APPEND GRAPHICS_SOURCE_FILES
         drivers/VchR02/vcSportMotionAlgo.h
         drivers/VchR02.h
 
-
-
         components/battery/BatteryController.h
         components/ble/BleController.h
         components/ble/NotificationManager.h
@@ -598,8 +597,8 @@ list(APPEND GRAPHICS_SOURCE_FILES
         libs/date/includes/date/ptz.h
         libs/date/includes/date/tz_private.h
         displayapp/LittleVgl.h
-        systemtask/SystemTask.h
         systemtask/SystemMonitor.h
+        systemtask/SystemTask.h        
         displayapp/screens/Symbols.h
         displayapp/screens/Test.h
         displayapp/screens/SensorDisplay.h

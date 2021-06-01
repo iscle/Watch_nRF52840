@@ -23,6 +23,10 @@
 #include "displayapp/icons/battery/battery_20.c"
 #include "displayapp/icons/battery/battery_50.c"
 #include "displayapp/icons/battery/battery_100.c"
+#include "displayapp/icons/battery/battery_05_c.c"
+#include "displayapp/icons/battery/battery_20_c.c"
+#include "displayapp/icons/battery/battery_50_c.c"
+#include "displayapp/icons/battery/battery_100_c.c"
 #include "displayapp/icons/bluetooth/bluetooth.c"
 #include "displayapp/icons/bluetooth/bluetoothdis.c"
 #include "displayapp/icons/bluetooth/pairdis.c"
@@ -62,7 +66,6 @@ extern lv_font_t San_Francisco_40;
 LV_IMG_DECLARE(helpButton);  
 LV_IMG_DECLARE(Okbutton);
 LV_IMG_DECLARE(TestButton);
-LV_IMG_DECLARE(battery_05);
 LV_IMG_DECLARE(Checkin);
 LV_IMG_DECLARE(impact);
 LV_IMG_DECLARE(close);
@@ -70,9 +73,14 @@ LV_IMG_DECLARE(Fall);
 LV_IMG_DECLARE(sensor);
 LV_IMG_DECLARE(arrowleft);
 LV_IMG_DECLARE(arrowright);
+LV_IMG_DECLARE(battery_05);
 LV_IMG_DECLARE(battery_20);
 LV_IMG_DECLARE(battery_50);
 LV_IMG_DECLARE(battery_100);
+LV_IMG_DECLARE(battery_05_c);
+LV_IMG_DECLARE(battery_20_c);
+LV_IMG_DECLARE(battery_50_c);
+LV_IMG_DECLARE(battery_100_c);
 LV_IMG_DECLARE(bluetooth);
 LV_IMG_DECLARE(bluetoothdis);
 LV_IMG_DECLARE(pairdis);
@@ -157,7 +165,7 @@ ScreenDisplay::ScreenDisplay(DisplayApp* app,
 
         logo = lv_label_create(lv_scr_act(), NULL);
         lv_obj_set_style_local_text_font(logo, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &San_Francisco_22);
-        lv_label_set_text(logo, "OEM Name 14.7.1"); 
+        lv_label_set_text(logo, "OEM Name 14.8");
         //lv_label_set_text(logo, "Zien Solutions"); 
         lv_obj_align(logo, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0, 5); 
 
@@ -298,7 +306,7 @@ ScreenDisplay::ScreenDisplay(DisplayApp* app,
           lv_obj_set_hidden(lablerightCircle,true);
 
           buttonSmall =  lv_icon_create(lv_scr_act(), &Okbutton);  
-          lv_obj_align(buttonSmall, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 17);
+          lv_obj_align(buttonSmall, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 27);
           /*
           x = lv_label_create(lv_scr_act(), NULL);
           lv_label_set_style(x, LV_LABEL_STYLE_MAIN, LabelSanStyle);
@@ -357,7 +365,7 @@ ScreenDisplay::ScreenDisplay(DisplayApp* app,
           lv_obj_set_hidden(lablerightCircle,true);
 
           buttonSmall =  lv_icon_create(lv_scr_act(), &Okbutton);  
-          lv_obj_align(buttonSmall, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 17);
+          lv_obj_align(buttonSmall, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 27);
           
           /*
           x = lv_label_create(lv_scr_act(), NULL);
@@ -434,6 +442,7 @@ ScreenDisplay::ScreenDisplay(DisplayApp* app,
           break;
         case Modes::Charging:
           batteryController.setGoToSleep(true);   
+          
           imgpair = lv_img_create(lv_scr_act(), nullptr);  
           lv_img_set_src(imgpair, &charging);
           lv_obj_align(imgpair, nullptr, LV_ALIGN_CENTER, 0, 10); 
@@ -443,6 +452,7 @@ ScreenDisplay::ScreenDisplay(DisplayApp* app,
           lv_label_set_text(tempCValue, ""); 
           lv_obj_set_style_local_text_font(tempCValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &San_Francisco_22); 
           lv_obj_align( tempCValue,lv_scr_act(), LV_ALIGN_CENTER, -25, 40);
+
           break;
         case Modes::LowBattery:         
           batteryController.setGoToSleep(true);  
@@ -569,17 +579,26 @@ bool ScreenDisplay::Refresh() {
     sprintf(timeStr, "%02d:%02d", static_cast<int>(hour), static_cast<int>(minute));     
         
     auto batteryPercent = batteryController.PercentRemaining();
-    if(batteryPercent<25) lv_img_set_src(batteryIcon, &battery_05);
-    else if(batteryPercent<50) lv_img_set_src(batteryIcon, &battery_20);
-    else if(batteryPercent<75) lv_img_set_src(batteryIcon, &battery_50);
-    else lv_img_set_src(batteryIcon, &battery_100);
+
+    if(!batteryController.IsCharging()) {
+      if(batteryPercent<15) lv_img_set_src(batteryIcon, &battery_05);
+      else if(batteryPercent<40) lv_img_set_src(batteryIcon, &battery_20);
+      else if(batteryPercent<85) lv_img_set_src(batteryIcon, &battery_50);
+      else lv_img_set_src(batteryIcon, &battery_100);
+    } else {
+    if(batteryPercent<15) lv_img_set_src(batteryIcon, &battery_05_c);
+    else if(batteryPercent<40) lv_img_set_src(batteryIcon, &battery_20_c);
+    else if(batteryPercent<90) lv_img_set_src(batteryIcon, &battery_50_c);
+    else lv_img_set_src(batteryIcon, &battery_100_c);      
+    }
     char strBat[4];
     sprintf (strBat, "%d", uint8_t(batteryPercent));
+    /*
     if(batteryController.IsCharging())
     {
       lv_obj_set_hidden(batteryPlug,false);
     } else lv_obj_set_hidden(batteryPlug,true);
-
+    */
     if (bleController.IsConnected()) { lv_img_set_src(bleIcon, &bluetooth);} 
     else { lv_img_set_src(bleIcon, &bluetoothdis); }  
   

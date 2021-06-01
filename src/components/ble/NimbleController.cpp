@@ -78,8 +78,8 @@ void NimbleController::Init() {
 
   auto& bleAddr = bleController.Address();
   sprintf(deviceName, "SA%02x%02x%02x",bleAddr[2], bleAddr[1], bleAddr[0]);
-  //res = ble_svc_gap_device_name_set(deviceName);
-  //ASSERT(res == 0);
+  res = ble_svc_gap_device_name_set(deviceName);
+  ASSERT(res == 0);
 
   res = ble_gatts_start();
   ASSERT(res == 0);
@@ -91,6 +91,13 @@ void NimbleController::ble_checkevent()
   keyfob.ble_checkevent();
   heartRateService.OnNewHeartRateValue();
 }
+
+void NimbleController::ble_acc_checkevent()
+{
+  heartRateService.OnNewHeartRateValue();
+}
+
+
 
 void NimbleController::StartAdvertising() {
   if(bleController.IsConnected() || ble_gap_conn_active() || ble_gap_adv_active()) return;
@@ -126,12 +133,11 @@ void NimbleController::StartAdvertising() {
   rsp_fields.name = (uint8_t *)deviceName;
   rsp_fields.name_len = strlen(deviceName);
   rsp_fields.name_is_complete = 1;
-  int res;
-  res=ble_gap_adv_set_fields(&fields);
-  ASSERT(res == 0); // TODO this one sometimes fails with error 22 (notsync)
+  ble_gap_adv_set_fields(&fields);
+  //ASSERT(res == 0); // TODO this one sometimes fails with error 22 (notsync)
 
-  res=ble_gap_adv_rsp_set_fields(&rsp_fields);
-  ASSERT(res == 0);
+  ble_gap_adv_rsp_set_fields(&rsp_fields);
+  //ASSERT(res == 0);
 
   ble_gap_adv_start(addrType, NULL, BLE_HS_FOREVER,
                           &adv_params, GAPEventCallback, this);

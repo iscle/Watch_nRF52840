@@ -33,7 +33,7 @@ static lv_style_t style_bg;
 static lv_style_t style_box;
 static lv_style_t style_box_border;
 static lv_style_t style_btn;
-static lv_style_t style_btn_border;
+//static lv_style_t style_btn_border;
 static lv_style_t style_title;
 static lv_style_t style_label_white;
 static lv_style_t style_back;

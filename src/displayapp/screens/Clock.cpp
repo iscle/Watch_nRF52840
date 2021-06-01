@@ -459,11 +459,12 @@ Clock::Clock(DisplayApp* app,
           lv_img_set_src(imgpair, &lowbattery);
           lv_obj_align(imgpair, nullptr, LV_ALIGN_CENTER, 0, 10); 
           timeoutCountStart = xTaskGetTickCount();
-
+/*
           tempCValue = lv_label_create(lv_scr_act(), nullptr);
           lv_label_set_text(tempCValue, "--");
          // lv_label_set_style(tempCValue, LV_LABEL_STYLE_MAIN, LabelSanStyle);
           lv_obj_align( tempCValue,lv_scr_act(), LV_ALIGN_CENTER, -20, 40);
+          */
           break;
 
         case Modes::Oxi:
@@ -802,7 +803,7 @@ bool Clock::Refresh() {
           flag =0;      
           lv_label_set_text(tempCValue, strBat);
         } else flag++;     
-        if(timeout>7*1024){ if(bleController.IsConnected()) app->SwichApp(0); else  app->SwichApp(7);}
+       // if(timeout>7*1024){ if(bleController.IsConnected()) app->SwichApp(0); else  app->SwichApp(7);}
         break;
 
     case Modes::LowBattery:

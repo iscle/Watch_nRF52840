@@ -12,8 +12,6 @@
 #include "displayapp/screens/FirmwareValidation.h"
 #include "systemtask/SystemTask.h"
 #include "displayapp/screens/ScreenDisplay.h"
-#include "SEGGER_RTT.h" 
-
 
 using namespace Watch::Applications;
 
@@ -31,7 +29,7 @@ DisplayApp::DisplayApp(Drivers::St7789 &lcd, Components::LittleVgl &lvgl, Driver
         touchPanel{touchPanel},        
         systemTask{systemTask},
         tempSensor{tempSensor} {
-          if(bleController.IsConnected()) SwitchApp(0); else  {SwitchApp(7); batteryController.setIsVibrate();}
+        if(bleController.IsConnected()) SwitchApp(0); else  {SwitchApp(7); batteryController.setIsVibrate();}
           msgQueue = xQueueCreate(queueSize, itemSize);
           onClockApp = true;         
         }
@@ -56,9 +54,6 @@ void DisplayApp::InitHw() {
 }
 
 
-uint32_t acc = 0;
-uint32_t count = 0;
-bool toggle = true;
 void DisplayApp::Refresh() {
   TickType_t queueTimeout;
   switch (state) {
@@ -93,6 +88,9 @@ void DisplayApp::Refresh() {
         if(bleController.IsConnected()) { SwitchApp(1);   appIndex =1; }          
         else SwitchApp(7);           
         break;
+      case Messages::UpdateBatteryLevel:
+        batteryController.Update();
+      break;
       case Messages::TouchEvent: {
         if (state != States::Running) break;        
         auto gesture = OnTouchEvent();
@@ -104,7 +102,7 @@ void DisplayApp::Refresh() {
               break;   
             case TouchEvents::SwipeLeft:
              if (!bleController.IsConnected() || checkupdate || checkCheckin|| checkFall || checkImpact) break;
-              SetFullRefresh(DisplayApp::FullRefreshDirections::Right);
+              SetFullRefresh(DisplayApp::FullRefreshDirections::Left);
               if(appIndex>0) {       
                 appIndex--;
                 SwitchApp(appIndex);               
@@ -112,13 +110,15 @@ void DisplayApp::Refresh() {
               break;
            case TouchEvents::SwipeRight:
              if (!bleController.IsConnected() || checkupdate || checkCheckin|| checkFall || checkImpact) break;
-              SetFullRefresh(DisplayApp::FullRefreshDirections::Left);
+              SetFullRefresh(DisplayApp::FullRefreshDirections::Right);
             if(appIndex<4) {     
                 appIndex++;
                 SwitchApp(appIndex);               
               } else {appIndex =0;   SwitchApp(appIndex);  } 
               break;
             case TouchEvents::DoubleTap:
+              nrf_gpio_pin_clear(2); 
+              if(bleController.IsConnected()) SwitchApp(0); else  SwitchApp(7);
               systemTask.PushMessage(System::SystemTask::Messages::GoToSleep);
               break;
             default:
@@ -134,7 +134,8 @@ void DisplayApp::Refresh() {
           checkImpact =false;
           checkCheckin =false;
           batteryController.setDisturnOff(false);             
-          appIndex=0;          
+          appIndex=0; 
+          SetFullRefresh(DisplayApp::FullRefreshDirections::None);          
           if(bleController.IsConnected()) SwitchApp(0); else  SwitchApp(7);
           systemTask.PushMessage(System::SystemTask::Messages::GoToSleep);
           break;
@@ -143,7 +144,8 @@ void DisplayApp::Refresh() {
           checkupdate= true;
           batteryController.setDisturnOff(true);
           currentScreen.reset(nullptr);
-          batteryController.setIsVibrate(); 
+          batteryController.setIsVibrate();
+          SetFullRefresh(DisplayApp::FullRefreshDirections::None); 
           currentScreen = std::make_unique<Screens::FirmwareUpdate>(this, bleController);       
           break;
 
@@ -152,6 +154,7 @@ void DisplayApp::Refresh() {
           checkImpact= true;
           batteryController.setButtonData(0x12); 
           batteryController.setIsAlert(0x12); 
+          SetFullRefresh(DisplayApp::FullRefreshDirections::None); 
           systemTask.PushMessage(System::SystemTask::Messages::AlwaysDisplay);    
           SwitchApp(5);      
           break;
@@ -161,6 +164,7 @@ void DisplayApp::Refresh() {
           //batteryController.setDisturnOff(true);
           batteryController.setButtonData(0x08);
           batteryController.setIsAlert(0x08); 
+          SetFullRefresh(DisplayApp::FullRefreshDirections::None); 
           systemTask.PushMessage(System::SystemTask::Messages::AlwaysDisplay);     
           SwitchApp(6);      
           break;
@@ -168,6 +172,7 @@ void DisplayApp::Refresh() {
       case Messages::CheckIn:  
           checkCheckin = true;
           //batteryController.setDisturnOff(true);
+          SetFullRefresh(DisplayApp::FullRefreshDirections::None); 
           systemTask.PushMessage(System::SystemTask::Messages::AlwaysDisplay);
           SwitchApp(10);      
           break;
@@ -178,10 +183,12 @@ void DisplayApp::Refresh() {
           break;
 
       case Messages::Lowbattery: 
+          SetFullRefresh(DisplayApp::FullRefreshDirections::None); 
           batteryController.setDisturnOff(false);
           SwitchApp(9);      
           break;
       case Messages::Charging:
+          SetFullRefresh(DisplayApp::FullRefreshDirections::None); 
           batteryController.setDisturnOff(false);     
           SwitchApp(8);
           break;

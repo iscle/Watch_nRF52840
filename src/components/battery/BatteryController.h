@@ -8,6 +8,30 @@
 #include <lvgl/lvgl.h>
 namespace Watch {
   namespace Controllers {
+
+    template <int N> class CircBuffer {
+    public:
+      CircBuffer() : arr {}, sz {}, cap {N}, head {} {
+      }
+      void insert(const int num) {
+        head %= cap;
+        arr[head++] = num;
+        if (sz != cap) {
+          sz++;
+        }
+      }
+
+      int GetAverage() const {
+        int sum = std::accumulate(arr.begin(), arr.end(), 0);
+        return (sum / sz);
+      }
+
+    private:
+      std::array<int, N> arr; /**< internal array used to store the values*/
+      uint8_t sz;             /**< The current size of the array.*/
+      uint8_t cap;            /**< Total capacity of the CircBuffer.*/
+      uint8_t head;           /**< The current head of the CircBuffer*/
+    };
     
     class Battery {
       public:
@@ -15,9 +39,8 @@ namespace Watch {
         void Init();
         void Update();
         float PercentRemaining() const { return percentRemaining;}
-        bool IsCharging() { return isCharging; }
-        bool IsPowerPresent() { return isPowerPresent; }
-       
+        bool IsCharging();
+        bool IsPowerPresent() { return isPowerPresent; }       
         void setButtonData( uint8_t data);
         void setButtonDataNoVibrate( uint8_t data);
         void setIsVibrate(void);
@@ -30,7 +53,6 @@ namespace Watch {
         void setisTimer1Display(bool data);
         void setisTimer2Display(bool data);
         void setGoToSleep(bool data);
-        bool CheckCharging();
         void setIsAlert(uint8_t data);    
         void setCurrentHour(uint8_t data) ;
         void setCurrentMinute(uint8_t data);
@@ -107,7 +129,10 @@ namespace Watch {
 
         void SaadcEventHandler(nrfx_saadc_evt_t const * p_event);
         static void adcCallbackStatic(nrfx_saadc_evt_t const *event);
+        
         static constexpr uint8_t percentRemainingSamples = 5;
+        CircBuffer<percentRemainingSamples> percentRemainingBuffer {};
+
         bool isReading = false;
         uint8_t samples = 0;
         float percentRemaining = 0.0f;

@@ -105,11 +105,10 @@ namespace Watch {
         void CheckLowbattery();
         void CheckCheckIn();
         void GoToRunning();
+        void CheckFallImpact();
         
-        bool isTouchDiscoveryTimerRunning = false;
-        uint8_t TouchDiscoveryTimer = 2;
-         bool isHandDiscoveryTimerRunning = false;
-        uint8_t HandDiscoveryTimer = 0;
+        bool isFallDiscoveryTimerRunning = false;
+        uint8_t FallDiscoveryTimer = 0;
         bool isImpactDiscoveryTimerRunning = false;
 
         uint8_t ble_notifyTimer =2;
@@ -135,7 +134,7 @@ namespace Watch {
         bool checkheartbeat = true;
         uint8_t checktimeheart=0;
         uint8_t checknumheart =0;
-       //float accValue=0;
+        float accValue=0;
         //bool runACC = true;
      
 /*

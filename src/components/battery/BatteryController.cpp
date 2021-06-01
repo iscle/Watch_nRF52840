@@ -17,11 +17,7 @@ void Battery::Init() {
   MotorControllerInit();
 }
 
-void Battery::Update() {
-
-  isCharging = !nrf_gpio_pin_read(chargingPin);
-  //isPowerPresent = !nrf_gpio_pin_read(powerPresentPin);
-  
+void Battery::Update() {  
   if ( isReading ) return;
   // Non blocking read
   samples = 0;
@@ -59,7 +55,7 @@ void Battery::SaadcInit() {
 void Battery::SaadcEventHandler(nrfx_saadc_evt_t const * p_event) {
 
     const float battery_max = 4.2; // maximum voltage of battery ( max charging voltage is 4.21 )
-    const float battery_min = 3.60; // minimum voltage of battery before shutdown ( depends on the battery )
+    const float battery_min = 3.7; // minimum voltage of battery before shutdown ( depends on the battery )
 
     if (p_event->type == NRFX_SAADC_EVT_DONE) {
       
@@ -73,7 +69,7 @@ void Battery::SaadcEventHandler(nrfx_saadc_evt_t const * p_event) {
       percentRemaining = std::max(percentRemaining, 0.0f);
       percentRemaining = std::min(percentRemaining, 100.0f);
 
-     // percentRemainingBuffer.insert(percentRemaining);
+      percentRemainingBuffer.insert(percentRemaining);
       samples++;
       if ( samples > percentRemainingSamples ) {
         nrfx_saadc_uninit();
@@ -99,8 +95,7 @@ void Battery::setButtonDataNoVibrate( uint8_t data) {
 void Battery::setIsTouch( bool data) {  isTouch = data;}  
 void Battery::setIsVibrate(void){ MotorControllerSetDuration(200);} 
 void Battery::StopVibrate(void) {MotorControllerStop();}
-
-
+bool Battery::IsCharging(){ return !nrf_gpio_pin_read(chargingPin);}
 
 void Battery::impactCharacteristic(uint8_t zz, uint8_t yy){
   impactyy=yy;

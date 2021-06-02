@@ -19,6 +19,7 @@
 #include "ServiceDiscovery.h"
 #include "Keyfob.h"
 #include "Datasensor.h"
+#include "HeartRateService.h"
 
 namespace Watch {
   namespace Drivers {
@@ -33,7 +34,7 @@ namespace Watch {
     class Ble;
     class DateTime;
     class NotificationManager;
-
+    class HeartRateService;
     class NimbleController {
 
       public:
@@ -55,6 +56,7 @@ namespace Watch {
 
         void StartDiscovery();
         void ble_checkevent();
+        void ble_acc_checkevent();
 
         //Watch::Controllers::MusicService& music() {return musicService;};
 
@@ -77,6 +79,7 @@ namespace Watch {
         //MusicService musicService;
        // BatteryInformationService batteryInformationService;  
         Keyfob keyfob;
+        HeartRateService heartRateService;
         //DataSensor dataSensor;        
         //ImmediateAlertService immediateAlertService;
         
@@ -88,7 +91,8 @@ namespace Watch {
 
         ble_uuid128_t dfuServiceUuid {
                 .u { .type = BLE_UUID_TYPE_128},
-               .value = {0x84,0x26,0xe2,0xe9,0x7b,0xab,0x89,0x95,0x90,0x46,0x8d,0x41,0x2A,0x15,0xdb,0x50}
+               //.value = {0x84,0x26,0xe2,0xe9,0x7b,0xab,0x89,0x95,0x90,0x46,0x8d,0x41,0x2A,0x15,0xdb,0x50}
+               .value = {0xfb,0x34,0x9b,0x5f,0x80,0x00,0x00,0x80,0x00,0x10,0x00,0x00,0x0d,0x18,0x00,0x00}
                
         };
         ServiceDiscovery serviceDiscovery;

@@ -6,14 +6,15 @@
 
 using namespace Watch::Drivers;
 
-St7789::St7789(Spi &spi, uint8_t pinDataCommand) : spi{spi}, pinDataCommand{pinDataCommand} {
+St7789::St7789(Spi& spi, uint8_t pinDataCommand) : spi {spi}, pinDataCommand {pinDataCommand} {
 }
 
 void St7789::Init() {
   spi.Init();
   nrf_gpio_cfg_output(pinDataCommand);
-  nrf_gpio_cfg_output(3);
   nrf_gpio_cfg_output(2);
+  nrf_gpio_pin_set(2);
+  nrf_gpio_cfg_output(3);
   nrf_gpio_pin_set(3);
   HardwareReset();
   SoftwareReset();
@@ -24,7 +25,6 @@ void St7789::Init() {
   RowAddressSet();
   DisplayInversionOn();
   NormalModeOn();
-  SetOrientation(Orientation_180);
   DisplayOn();
 }
 
@@ -38,9 +38,8 @@ void St7789::WriteData(uint8_t data) {
   WriteSpi(&data, 1);
 }
 
-
 void St7789::WriteSpi(const uint8_t* data, size_t size) {
-    spi.Write(data, size);
+  spi.Write(data, size);
 }
 
 void St7789::SoftwareReset() {
@@ -64,26 +63,23 @@ void St7789::ColMod() {
 
 void St7789::MemoryDataAccessControl() {
   WriteCommand(static_cast<uint8_t>(Commands::MemoryDataAccessControl));
-  //WriteData(0x00);
-   WriteData(Orientation_180);
+  WriteData(0xc0);
 }
 
 void St7789::ColumnAddressSet() {
   WriteCommand(static_cast<uint8_t>(Commands::ColumnAddressSet));
+  WriteData(0x00);
+  WriteData(0x00);
   WriteData(Width >> 8u);
   WriteData(Width & 0xffu);
-  WriteData(0x00);
-  WriteData(0x00);
-
 }
 
 void St7789::RowAddressSet() {
   WriteCommand(static_cast<uint8_t>(Commands::RowAddressSet));
-  WriteData(240u >> 8u);
-  WriteData(240u & 0xffu);
   WriteData(0x00);
   WriteData(0x00);
-
+  WriteData(320u >> 8u);
+  WriteData(320u & 0xffu);
 }
 
 void St7789::DisplayInversionOn() {
@@ -98,8 +94,6 @@ void St7789::NormalModeOn() {
 
 void St7789::DisplayOn() {
   WriteCommand(static_cast<uint8_t>(Commands::DisplayOn));
-  nrf_delay_ms(100);
-  nrf_gpio_pin_set(2);
 }
 
 void St7789::SetAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
@@ -110,7 +104,7 @@ void St7789::SetAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
   WriteData(x1 & 0xff);
 
   WriteCommand(static_cast<uint8_t>(Commands::RowAddressSet));
-  WriteData(y0>>8);
+  WriteData(y0 >> 8);
   WriteData(y0 & 0xff);
   WriteData(y1 >> 8);
   WriteData(y1 & 0xff);
@@ -124,9 +118,8 @@ void St7789::WriteToRam() {
 
 void St7789::DisplayOff() {
   nrf_gpio_pin_clear(2);
-  nrf_delay_ms(100);
   WriteCommand(static_cast<uint8_t>(Commands::DisplayOff));
-  nrf_delay_ms(10);
+  nrf_delay_ms(200);
 }
 
 void St7789::VerticalScrollDefinition(uint16_t topFixedLines, uint16_t scrollLines, uint16_t bottomFixedLines) {
@@ -146,39 +139,27 @@ void St7789::VerticalScrollStartAddress(uint16_t line) {
   WriteData(line & 0x00ffu);
 }
 
-
 void St7789::Uninit() {
-
 }
 
 void St7789::DrawPixel(uint16_t x, uint16_t y, uint32_t color) {
-  if((x < 0) ||(x >= Width) || (y < 0) || (y >= Height)) return;
+  if ((x < 0) || (x >= Width) || (y < 0) || (y >= Height))
+    return;
 
-  SetAddrWindow(x, y, x+1, y+1);
+  SetAddrWindow(x, y, x + 1, y + 1);
 
   nrf_gpio_pin_set(pinDataCommand);
-  WriteSpi(reinterpret_cast<const uint8_t *>(&color), 2);
+  WriteSpi(reinterpret_cast<const uint8_t*>(&color), 2);
 }
 
-void St7789::BeginDrawBuffer(uint16_t x, uint16_t y, uint16_t width, uint16_t height) {
-  if((x >= Width) || (y >= Height)) return;
-  if((x + width - 1) >= Width)  width = Width  - x;
-  if((y + height - 1) >= Height) height = Height - y;
-
- if (madctlReg == Orientation_180) y += (320 - 240);
-
-  SetAddrWindow(0+x, y, x+width-1, y+height-1);
-  nrf_gpio_pin_set(pinDataCommand);
-}
-
-
-void St7789::DrawBuffer(uint16_t x, uint16_t y, uint16_t width, uint16_t height, const uint8_t *data, size_t size) {
+void St7789::DrawBuffer(uint16_t x, uint16_t y, uint16_t width, uint16_t height, const uint8_t* data, size_t size) {
+ // if((x >= Width) || (y >= Height)) return;
+ // if((x + width - 1) >= Width)  width = Width  - x;
+ // if((y + height - 1) >= Height) height = Height - y;
+  y +=80;  
+  
   SetAddrWindow(x, y, x + width - 1, y + height - 1);
   nrf_gpio_pin_set(pinDataCommand);
-  WriteSpi(data, size);
-}
-
-void St7789::NextDrawBuffer(const uint8_t *data, size_t size) {
   WriteSpi(data, size);
 }
 
@@ -189,14 +170,13 @@ void St7789::HardwareReset() {
 }
 
 void St7789::Sleep() {
-  nrf_gpio_pin_clear(2);
-  nrf_delay_ms(20);
   SleepIn();
-  nrf_gpio_cfg_default(pinDataCommand);  
+  nrf_gpio_cfg_default(pinDataCommand);
 }
 
 void St7789::Wakeup() {
   nrf_gpio_cfg_output(pinDataCommand);
+  // TODO why do we need to reset the controller?
   HardwareReset();
   SoftwareReset();
   SleepOut();
@@ -208,10 +188,5 @@ void St7789::Wakeup() {
   NormalModeOn();
   VerticalScrollStartAddress(verticalScrollingStartAddress);
   DisplayOn();
+  nrf_gpio_pin_set(2);
 }
-void St7789::SetOrientation(Orientation orientation)
-{  // clear and set (MY,MX,MV,ML bits on MADCTL register)
-  madctlReg &= ~0xf0;
-  madctlReg |= (uint8_t) orientation;
-  MemoryDataAccessControl();
-} 

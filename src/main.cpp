@@ -74,29 +74,43 @@ Watch::Drivers::TwiMaster twiMaster{Watch::Drivers::TwiMaster::Modules::TWIM1,
 Watch::Drivers::Cst816S touchPanel {twiMaster, touchPanelTwiAddress};
 //Watch::Drivers::Kx022 motionSensor{twiMaster, motionSensorTwiAddress};
 
-
 Watch::Components::LittleVgl lvgl {lcd, touchPanel};
 
 TimerHandle_t debounceTimer;
+TimerHandle_t debounceChargeTimer;
 Watch::Controllers::Battery batteryController;
 Watch::Controllers::Ble bleController;
 Watch::Controllers::DateTime dateTimeController;
 void ble_manager_set_ble_connection_callback(void (*connection)());
 void ble_manager_set_ble_disconnection_callback(void (*disconnection)());
 static constexpr uint8_t pinTouchIrq = 25;
+static constexpr uint8_t pinPowerPresentIrq = 20;
 std::unique_ptr<Watch::System::SystemTask> systemTask;
 
 Watch::Controllers::NotificationManager notificationManager;
 Watch::Drivers::Acnt101 acnt101;
 
 void nrfx_gpiote_evt_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action) {
-  if(pin == pinTouchIrq) {
+  if (pin == pinTouchIrq) {
     systemTask->OnTouchEvent();
-    return ;
+    return;
   }
+
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+  if (pin == pinPowerPresentIrq and action == NRF_GPIOTE_POLARITY_TOGGLE) {
+    xTimerStartFromISR(debounceChargeTimer, &xHigherPriorityTaskWoken);
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+    return;
+  }
+
   xTimerStartFromISR(debounceTimer, &xHigherPriorityTaskWoken);
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+}
+
+void DebounceTimerChargeCallback(TimerHandle_t xTimer) {
+  xTimerStop(xTimer, 0);
+  systemTask->PushMessage(Watch::System::SystemTask::Messages::OnChargingEvent);
 }
 
 
@@ -120,6 +134,7 @@ void DebounceTimerCallback(TimerHandle_t xTimer) {
   systemTask->OnButtonPushed();
 }
 
+extern "C" {
 void SPIM0_SPIS0_TWIM0_TWIS0_SPI0_TWI0_IRQHandler(void) {
   if(((NRF_SPIM0->INTENSET & (1<<6)) != 0) && NRF_SPIM0->EVENTS_END == 1) {
     NRF_SPIM0->EVENTS_END = 0;
@@ -134,8 +149,8 @@ void SPIM0_SPIS0_TWIM0_TWIS0_SPI0_TWI0_IRQHandler(void) {
   if(((NRF_SPIM0->INTENSET & (1<<1)) != 0) && NRF_SPIM0->EVENTS_STOPPED == 1) {
     NRF_SPIM0->EVENTS_STOPPED = 0;
   }
+  }
 }
-
 static void (*radio_isr_addr)(void) ;
 static void (*rng_isr_addr)(void) ;
 static void (*rtc0_isr_addr)(void) ;
@@ -235,6 +250,8 @@ void nimble_port_ll_task_func(void *args) {
 int main(void) { 
   nrf_drv_clock_init();
   debounceTimer = xTimerCreate ("debounceTimer", 200, pdFALSE, (void *) 0, DebounceTimerCallback);
+  debounceChargeTimer = xTimerCreate("debounceTimerCharge", 200, pdFALSE, (void*) 0, DebounceTimerChargeCallback);
+
   systemTask.reset(new Watch::System::SystemTask(spi, lcd, spiNorFlash, twiMaster, touchPanel, motionSensor,
           lvgl, batteryController, bleController,dateTimeController, notificationManager,acnt101));
   systemTask->Start();

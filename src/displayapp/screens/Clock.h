@@ -25,7 +25,7 @@ namespace Watch {
 
       class Clock : public Screen {
         public:
-        enum class Modes {Clock, Test, CheckIn, Impact, Fall, Sensor,PairDis, Charging, LowBattery,Oxi};
+        enum class Modes {Clock, Test, CheckIn, Impact, Fall, Sensor,PairDis, Charging, LowBattery,Oxi,Temp};
           Clock(DisplayApp* app,
                   Controllers::DateTime& dateTimeController,
                   Controllers::Battery& batteryController,
@@ -34,23 +34,22 @@ namespace Watch {
                   Modes mode
                   );
           ~Clock() override;
-
           bool Refresh() override;
           bool OnButtonPushed() override;
-
           void OnObjectEvent(lv_obj_t *pObj, lv_event_t i);
-
         private:
 
           bool OnTouchEvent(TouchEvents event);
           void buttonEven(lv_obj_t *obj, Modes mode);
-          bool OnTouchEvent(uint16_t x, uint16_t y) override;
+          bool OnTouchEvent(uint16_t x, uint16_t y);
+          
           static const char* MonthToString(Watch::Controllers::DateTime::Months month);
           static const char* DayOfWeekToString(Watch::Controllers::DateTime::Days dayOfWeek);
           static char const *DaysString[];
           static char const *MonthsString[];
 
-          lv_obj_t* logo;   
+          lv_obj_t* logo; 
+          lv_obj_t* backgroundLabel;  
           lv_obj_t* label_time;
           lv_obj_t* label_date;
           lv_obj_t* batteryIcon;
@@ -68,10 +67,31 @@ namespace Watch {
           lv_obj_t* labelpoint;  
           lv_obj_t* checkButton;
           lv_obj_t* imgpair; 
+          lv_obj_t* lablebpm;
+          lv_obj_t* lablepercent;
+          lv_obj_t* lableftemp;
+          lv_obj_t* lablectemp;
           lv_obj_t* lableleftCircle;
           lv_obj_t* labletopCircle;
           lv_obj_t* lablerightCircle;
-          lv_obj_t* lablebottomCircle;
+          lv_obj_t* lableleftCircleSmall;
+          lv_obj_t* labletopCircleSmall;
+          lv_obj_t* lablerightCircleSmall;
+          lv_obj_t* lablebottomCircleSmall;
+         /* lv_obj_t* Xmax; 
+          lv_obj_t* Ymax;
+          lv_obj_t* Zmax;
+          lv_obj_t* x;
+          lv_obj_t* y;
+          lv_obj_t* z;
+          lv_obj_t* gwatch;
+          */
+          lv_obj_t* textline1;
+          lv_obj_t* textline2;
+          lv_obj_t * label;
+          lv_obj_t * imgbtn1;
+
+          
             
           Controllers::DateTime& dateTimeController;
           Controllers::Battery& batteryController;
@@ -84,6 +104,7 @@ namespace Watch {
           bool running = true;
           uint32_t timeoutCountStart;
           uint32_t timeoutCountStartL;
+          uint32_t timeoutCountStartH;
           uint32_t timeout;
           bool checkVibrate= true;          
           bool checkcharging = false;
@@ -97,7 +118,8 @@ namespace Watch {
           int mod =0;
           int modt =0;
           bool checkTouchBigButton =false;
-          bool checkTouchBigButtonF =false;
+          float rawTemp =0.0;
+
 
       };
     }

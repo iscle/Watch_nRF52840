@@ -49,7 +49,7 @@ Watch::Drivers::SpiNorFlash spiNorFlash{flashSpi};
 Watch::Drivers::Spi lcdSpi {spi, pinLcdCsn};
 Watch::Drivers::St7789 lcd {lcdSpi, pinLcdDataCommand};
 
-Watch::Components::Gfx gfx{lcd};
+//Watch::Components::Gfx gfx{lcd};
 
 extern "C" {
 void vApplicationIdleHook(void) {
@@ -84,9 +84,9 @@ void Process(void* instance) {
   spiNorFlash.Init();
   spiNorFlash.Wakeup();
   lcd.Init();
-  gfx.Init();
+  //gfx.Init();
   NRF_LOG_INFO("Init Done!")
-
+/*
   NRF_LOG_INFO("Erasing...");
   for (uint32_t erased = 0; erased < graphicSize; erased += 0x1000) {
     spiNorFlash.SectorErase(erased);
@@ -115,7 +115,7 @@ void Process(void* instance) {
   }
 
   NRF_LOG_INFO("Done!");
-
+*/
   while(1) {
     asm("nop" );
   }

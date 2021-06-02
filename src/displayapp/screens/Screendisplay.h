@@ -102,6 +102,7 @@ namespace Watch {
           lv_obj_t* battery;
           lv_obj_t* buttonCheckin;
           lv_obj_t* img;
+          // lv_obj_t* arc;
 
 
           Controllers::DateTime& dateTimeController;

@@ -11,26 +11,24 @@ extern lv_font_t San_Francisco_50;
 FirmwareUpdate::FirmwareUpdate(Watch::Applications::DisplayApp *app, Watch::Controllers::Ble& bleController) :
       Screen(app), bleController{bleController} {
 
-  titleLabel = lv_label_create(lv_scr_act(), nullptr);
-  lv_label_set_text(titleLabel, "Firmware update");
-  lv_obj_set_auto_realign(titleLabel, true);
-  static lv_style_t labelStyle;
-  static lv_style_t labelStyleF;
-  lv_style_copy(& labelStyleF, &lv_style_plain);
-  labelStyleF.text.font = &San_Francisco_22;
-  labelStyleF.text.color=LV_COLOR_RED; 
- 
-  lv_label_set_style(titleLabel,LV_LABEL_STYLE_MAIN,&labelStyleF);
-  lv_obj_align(titleLabel, nullptr, LV_ALIGN_IN_TOP_MID, 0, 50);
+  backgroundLabel = lv_label_create(lv_scr_act(), nullptr);
+  lv_label_set_long_mode(backgroundLabel, LV_LABEL_LONG_CROP);
+  lv_obj_set_size(backgroundLabel, 240, 240);
+  lv_obj_set_pos(backgroundLabel, 0, 0);
+  lv_label_set_text(backgroundLabel, "");    
 
-  lv_style_copy(&labelStyle, &lv_style_plain);
-  labelStyle.text.font = &San_Francisco_50;
-  labelStyle.text.color=LV_COLOR_WHITE; 
+  titleLabel = lv_label_create(lv_scr_act(), nullptr);
+  lv_label_set_recolor(titleLabel, true);     
+  lv_label_set_text(titleLabel, "#ff0000 Firmware update#");
+  lv_obj_set_auto_realign(titleLabel, true);
+ 
+  lv_obj_set_style_local_text_font(titleLabel, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &San_Francisco_22);
+  lv_obj_align(titleLabel, nullptr, LV_ALIGN_IN_TOP_MID, 0, 50);
 
   percentLabel = lv_label_create(lv_scr_act(), nullptr);
   lv_label_set_text(percentLabel, "");
   lv_obj_set_auto_realign(percentLabel, true);
-  lv_label_set_style(percentLabel,LV_LABEL_STYLE_MAIN,&labelStyle);
+  lv_obj_set_style_local_text_font(percentLabel, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &San_Francisco_50);
    lv_obj_align(percentLabel, nullptr,  LV_ALIGN_CENTER, 0, 40);
 }
 

@@ -15,7 +15,6 @@
 #include "drivers/Acnt101.h"
 #include "LittleVgl.h"
 #include <date/date.h>
-#include "displayapp/screens/Clock.h"
 #include "displayapp/screens/Modal.h"
 #include <drivers/Watchdog.h>
 #include "TouchEvents.h"
@@ -30,7 +29,7 @@ namespace Watch {
     class DisplayApp {
       public:
         enum class States {Idle, Running};
-        enum class Messages : uint8_t {GoToSleep, GoToRunning, TouchEvent, UpdateBleConnection,Charging,ButtonPushed, BleFirmwareUpdateStarted,Impact,Fall,CheckIn,Clock,Lowbattery};
+        enum class Messages : uint8_t {GoToSleep,UpdateBatteryLevel,GoToRunning,TouchEvent, UpdateBleConnection,Charging,ButtonPushed, BleFirmwareUpdateStarted,Impact,Fall,CheckIn,Clock,Lowbattery};
         enum class TouchModes { Gestures, Polling };
          enum class FullRefreshDirections { None, Up, Down, Left, Right, LeftAnim, RightAnim };
 
@@ -41,26 +40,16 @@ namespace Watch {
                    Watch::Drivers::Acnt101& tempSensor);
         void Start();
         void PushMessage(Messages msg);
-        void StartApp(Apps app);
-        void SwichApp(uint8_t app);
+        void SwitchApp(uint8_t app) ;
+        void StartApp(uint8_t app, DisplayApp::FullRefreshDirections direction);
         void SetTouchMode(TouchModes mode);
         void SetFullRefresh(FullRefreshDirections direction);
 
-      private:
+     private:
         TaskHandle_t taskHandle;
-        static void Process(void* instance);
-        void InitHw();
+
         Watch::Drivers::St7789& lcd;
-        Watch::Components::LittleVgl& lvgl;
-        void Refresh();
-       
-        States state = States::Running;
-        void RunningState();
-        QueueHandle_t msgQueue;
-
-        static constexpr uint8_t queueSize = 10;
-        static constexpr uint8_t itemSize = 1;
-
+        Watch::Components::LittleVgl& lvgl;   
         Watch::Controllers::Battery &batteryController;
         Watch::Controllers::Ble &bleController;
         Watch::Controllers::DateTime& dateTimeController;
@@ -68,9 +57,27 @@ namespace Watch {
         Watch::Drivers::Cst816S& touchPanel;
         Watch::System::SystemTask& systemTask;
         Watch::Drivers::Acnt101& tempSensor;
+        Watch::Controllers::FirmwareValidator validator;      
 
         
+        std::unique_ptr<Screens::Screen> currentScreen;
+        Apps currentApp = Apps::None;
+        Apps returnToApp = Apps::None;
+        FullRefreshDirections returnDirection = FullRefreshDirections::None;
+        TouchEvents returnTouchEvent = TouchEvents::None;
+        TouchModes touchMode = TouchModes::Gestures;
+        States state = States::Running;
+        QueueHandle_t msgQueue;
+        static constexpr uint8_t queueSize = 10;
+        static constexpr uint8_t itemSize = 1;
         TouchEvents OnTouchEvent();
+        void RunningState();
+        void IdleState();
+        static void Process(void* instance);
+        void InitHw();
+        void Refresh();
+        void ReturnApp(Apps app, DisplayApp::FullRefreshDirections direction, TouchEvents touchEvent);
+        void LoadApp(Apps app, DisplayApp::FullRefreshDirections direction);
 
         bool isClock = true;
         uint8_t appIndex=0;       
@@ -79,12 +86,7 @@ namespace Watch {
         bool checkupdate = false;
         bool checkFall = false;
         bool checkImpact = false ;
-        bool checkCheckin =false;  
-        std::unique_ptr<Screens::Modal> modal;
-
-        Watch::Controllers::FirmwareValidator validator;
-        TouchModes touchMode = TouchModes::Gestures;
-        std::unique_ptr<Screens::Screen> currentScreen;
+        bool checkCheckin =false;       
     };
   }
 }

@@ -11,8 +11,10 @@
 #include "../DisplayApp.h"
 #include "displayapp/icons/clock/helpButton.c"
 #include "displayapp/icons/clock/Okbutton.c"
-#include "displayapp/icons/clock/TestButton.c"
-#include "displayapp/icons/clock/Checkin.c"
+//#include "displayapp/icons/clock/TestButton.c"
+#include "displayapp/icons/clock/TestNewScreen"
+//#include "displayapp/icons/clock/Checkin.c"
+#include "displayapp/icons/clock/NewScreenCheckIn.c
 #include "displayapp/icons/clock/sensor.c"
 
 using namespace Watch::Applications::Screens;
@@ -23,9 +25,11 @@ extern lv_style_t* LabelBigStyle;
 extern lv_style_t* LabelSanStyle;
 LV_IMG_DECLARE(helpButton);  // your image src declaration
 LV_IMG_DECLARE(Okbutton);
-LV_IMG_DECLARE(TestButton);
+//LV_IMG_DECLARE(TestButton);
+LV_IMG_DECLARE(TestNewScreen);
 LV_IMG_DECLARE(sensor);
-LV_IMG_DECLARE(Checkin);
+//LV_IMG_DECLARE(Checkin);
+LV_IMG_DECLARE(NewScreenCheckIn);
 
 
 static void event_handler(lv_obj_t * obj, lv_event_t event) {
@@ -81,7 +85,8 @@ Screendisplay::Screendisplay(DisplayApp* app,
             lv_obj_align(buttonOK, nullptr, LV_ALIGN_IN_TOP_RIGHT, 10, 30);
         break;
       case Modes::Test:
-            buttonTest =  batteryController.lv_icon_create(lv_scr_act(), &TestButton);  
+            //buttonTest =  batteryController.lv_icon_create(lv_scr_act(), &TestButton); 
+            buttonTest =  batteryController.lv_icon_create(lv_scr_act(), &TestNewScreen);  
             buttonTest->user_data = this;
             lv_obj_set_event_cb( buttonTest, event_handler);
             lv_obj_align( buttonTest, NULL, LV_ALIGN_CENTER, 0,20);
@@ -117,7 +122,7 @@ Screendisplay::Screendisplay(DisplayApp* app,
 
       break;
       case Modes::CheckIn:
-            buttonCheckin =  batteryController.lv_icon_create(lv_scr_act(), &Checkin);  
+            buttonCheckin =  batteryController.lv_icon_create(lv_scr_act(), &NewScreenCheckIn);  
             buttonCheckin->user_data = this;
             lv_obj_set_event_cb( buttonCheckin, event_handler);
             lv_obj_align( buttonCheckin, NULL, LV_ALIGN_CENTER, 0,20);

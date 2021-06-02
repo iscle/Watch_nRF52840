@@ -43,8 +43,8 @@ if (ctxt->op == BLE_GATT_ACCESS_OP_WRITE_CHR) {
 return 0;
 }
 
-int Keyfob::ble_checkevent()
-{       if(batteryController.getIsTouch()){ 
+int Keyfob::ble_checkevent(){       
+        if(batteryController.getIsTouch()){ 
         ble_gatts_find_chr((ble_uuid_t *) &deviceInfoUuid, (ble_uuid_t *) &dataCharacteristicUuid, nullptr, &chr_val_handle);     
         ble_gatts_chr_updated(chr_val_handle);
         batteryController.setIsTouch(false);}        
@@ -65,10 +65,14 @@ if (ctxt->op == BLE_GATT_ACCESS_OP_WRITE_CHR) {
                         break;
                         case 6:
                                 batteryController.impactCharacteristic(result.zz, result.yy);
+                        break;                    
+                        case 9:
+                                NVIC_SystemReset();
                         break;
                         default :
                                 batteryController.trackCharacteristic(result.zz, result.yy,result.nn);
                         break;
+                       
                   }
                 
 } else if (ctxt->op == BLE_GATT_ACCESS_OP_READ_CHR) {                 

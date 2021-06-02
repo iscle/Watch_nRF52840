@@ -36,7 +36,7 @@ bool Spi::Init() {
 void Spi::Wakeup() {
   nrf_gpio_cfg_output(pinCsn);
   nrf_gpio_pin_set(pinCsn);
-  NRF_LOG_INFO("[SPI] Wakeup")
+ // NRF_LOG_INFO("[SPI] Wakeup")
 }
 
 

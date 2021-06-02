@@ -28,8 +28,8 @@ namespace Watch {
   namespace System {
     class SystemTask {
       public:
-        enum class Messages {GoToSleep, GoToRunning, BleConnected,
-            BleFirmwareUpdateStarted, BleFirmwareUpdateFinished, OnTouchEvent, OnButtonEvent, OnDisplayTaskSleeping, AlwaysDisplay };
+        enum class Messages {GoToSleep, GoToRunning, BleConnected, TouchWakeUp, OnChargingEvent,
+            BleFirmwareUpdateStarted, BleFirmwareUpdateFinished, OnTouchEvent, OnButtonEvent, OnDisplayTaskSleeping, AlwaysDisplay,UpdateTimeOut};
   
        SystemTask(Drivers::SpiMaster &spi, Drivers::St7789 &lcd,
                    Watch::Drivers::SpiNorFlash& spiNorFlash,
@@ -48,14 +48,14 @@ namespace Watch {
 
         void OnButtonPushed();
         void OnTouchEvent();
-
         void OnIdle();
         void ReadTempSensor();
         void ResetSensor();
         void CheckACC();
+        void CheckCommon();
         void CheckTracking();
         void CheckHeartbeat();
-
+        void UpdateTimeOut(uint32_t timeout);
 
         Watch::Controllers::NimbleController& nimble() {return nimbleController;};
 
@@ -81,12 +81,12 @@ namespace Watch {
           Watch::Drivers::WatchdogView watchdogView;
           Watch::Controllers::NotificationManager& notificationManager;
           Watch::Drivers::Acnt101& tempSensor;
-          Watch::Drivers::Acnt101Adc tempSensorAdc;
+          //Watch::Drivers::Acnt101Adc tempSensorAdc;
           //Watch::Drivers::Kx022& motionSensor;
           Watch::Drivers::Kx126& motionSensor;
           Watch::Controllers::NimbleController nimbleController;   
-          Watch::Drivers::VchR02 heartRateSensor;           
-  
+          Watch::Drivers::VchR02 heartRateSensor;    
+
         static constexpr uint8_t pinSpiSck = 16;
         static constexpr uint8_t pinSpiMosi = 14;
         static constexpr uint8_t pinSpiMiso = 15;
@@ -95,22 +95,26 @@ namespace Watch {
         static constexpr uint8_t pinLcdDataCommand = 11;
         static constexpr uint8_t pinSpiAccCsn = 8;
         static constexpr uint8_t pinButton = 27;
-        static constexpr uint8_t pinTouchIrq = 25;  
+        static constexpr uint8_t pinTouchIrq = 25; 
+        static constexpr uint8_t pinPowerPresentIrq = 20; 
 
 
         static void Process(void* instance);
         void Work();
         void ReloadIdleTimer() const;
+        void CheckLowbattery();
+        void CheckCheckIn();
+        void GoToRunning();
+        void CheckFallImpact();
         
-        bool isTouchDiscoveryTimerRunning = false;
-        uint8_t TouchDiscoveryTimer = 2;
-         bool isHandDiscoveryTimerRunning = false;
-        uint8_t HandDiscoveryTimer = 0;
+        bool isFallDiscoveryTimerRunning = false;
+        uint8_t FallDiscoveryTimer = 0;
         bool isImpactDiscoveryTimerRunning = false;
 
         uint8_t ble_notifyTimer =2;
         TimerHandle_t idleTimer;
         TimerHandle_t idleTimerAcc;
+        TimerHandle_t idleTimerCommon;
         TimerHandle_t idleTimerTracking;
         TimerHandle_t idleTimerHeartbeat;
         bool doNotGoToSleep = false;
@@ -118,8 +122,9 @@ namespace Watch {
         uint32_t tempData = 0;
         uint8_t Touch=0;
         bool checkcharging = false;
+        bool precheckcharging = false;
         bool checklowbattery = false;
-        void GoToRunning();
+      
         bool checkbright= false;
         uint8_t BrightDiscoveryTimer = 0;
         uint8_t prehour=0;
@@ -130,6 +135,7 @@ namespace Watch {
         uint8_t checktimeheart=0;
         uint8_t checknumheart =0;
         float accValue=0;
+        //bool runACC = true;
      
 /*
 #if configUSE_TRACE_FACILITY == 1

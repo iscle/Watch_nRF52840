@@ -2,10 +2,10 @@
 erase
 r 
 g
-loadbin /home/dthien/DeviceDownload/Watch_nRF52840/bootloader/bootloader.bin 0x0000000
+loadbin /home/hthang/Watch_nRF52840/bootloader/bootloader.bin 0x0000000
 r
 g
-loadbin /home/dthien/DeviceDownload/Watch_nRF52840/build/src/watch-mcuboot-app-image-0.14.1.bin 0x00008000
+loadbin /home/hthang/Watch_nRF52840/build/src/watch-mcuboot-app-image-0.14.8.bin 0x00008000
 r
 g
 q

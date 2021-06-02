@@ -32,7 +32,7 @@ Pair::Pair(DisplayApp *app,
   lv_obj_align(bleIcon, batteryPlug, LV_ALIGN_OUT_LEFT_MID, -5, 0);
 
   logo = lv_label_create(lv_scr_act(), NULL);
-  lv_label_set_style(logo, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+  //lv_label_set_style(logo, LV_LABEL_STYLE_MAIN, LabelSanStyle);
   lv_label_set_text(logo, "OEM Name"); 
   lv_obj_align(logo, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0, 0); 
 
@@ -76,8 +76,6 @@ bool Pair::Refresh() {
     lv_obj_align(bleIcon, batteryPlug, LV_ALIGN_OUT_LEFT_MID, -5, 0);
 
 
-
-  
 
   return running;
 }

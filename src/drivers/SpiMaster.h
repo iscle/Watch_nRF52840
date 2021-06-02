@@ -10,7 +10,7 @@ namespace Watch {
   namespace Drivers {
     class SpiMaster {
       public:;
-        enum class SpiModule : uint8_t {SPI0, SPI1};
+        enum class SpiModule : uint8_t {SPI0, SPI1, SPI2};
         enum class BitOrder : uint8_t {Msb_Lsb, Lsb_Msb};
         enum class Modes : uint8_t {Mode0, Mode1, Mode2, Mode3};
         enum class Frequencies : uint8_t {Freq8Mhz};

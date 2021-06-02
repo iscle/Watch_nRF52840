@@ -38,6 +38,16 @@
 #include "displayapp/icons/clock/leftCircle.c"
 #include "displayapp/icons/clock/topCircle.c"
 #include "displayapp/icons/clock/rightCircle.c"
+#include "displayapp/icons/clock/leftCircleSmall.c"
+#include "displayapp/icons/clock/topCircleSmall.c"
+#include "displayapp/icons/clock/rightCircleSmall.c"
+#include "displayapp/icons/clock/bottomCircleSmall.c"
+#include "displayapp/icons/temp/temp.c"
+#include "displayapp/icons/clock/pointtemp.c"
+#include "displayapp/icons/clock/bpm.c"
+#include "displayapp/icons/temp/ftemp.c"
+#include "displayapp/icons/temp/ctemp.c"
+#include "displayapp/icons/oxi/spo2.c"
 #include "nrf_delay.h"
 
 extern "C" {
@@ -45,12 +55,10 @@ extern "C" {
 }
 
 using namespace Watch::Applications::Screens;
-
+extern lv_font_t San_Francisco_20;
 extern lv_font_t San_Francisco_22;
 extern lv_font_t San_Francisco_30;
-extern lv_style_t* LabelBigStyle;
-extern lv_style_t* LabelSanStyle;
-extern lv_style_t* LabelSmallStyle;
+extern lv_font_t San_Francisco_40;
 LV_IMG_DECLARE(helpButton);  
 LV_IMG_DECLARE(Okbutton);
 LV_IMG_DECLARE(TestButton);
@@ -73,6 +81,7 @@ LV_IMG_DECLARE(pointclock);
 LV_IMG_DECLARE(pointtest);
 LV_IMG_DECLARE(pointsensor);
 LV_IMG_DECLARE(pointoxi);
+LV_IMG_DECLARE(pointtemp);
 LV_IMG_DECLARE(lowbattery);
 LV_IMG_DECLARE(oxi);
 LV_IMG_DECLARE(chargingicon);
@@ -80,32 +89,41 @@ LV_IMG_DECLARE(dischargingicon);
 LV_IMG_DECLARE(leftCircle);
 LV_IMG_DECLARE(topCircle);
 LV_IMG_DECLARE(rightCircle);
+LV_IMG_DECLARE(leftCircleSmall);
+LV_IMG_DECLARE(topCircleSmall);
+LV_IMG_DECLARE(rightCircleSmall);
+LV_IMG_DECLARE(bottomCircleSmall);
+LV_IMG_DECLARE(temp);
+LV_IMG_DECLARE(bpm);
+LV_IMG_DECLARE(ctemp);
+LV_IMG_DECLARE(ftemp);
+LV_IMG_DECLARE(spo2);
 
 static lv_obj_t * lv_icon_create(lv_obj_t*par, const void* img_src){
     lv_obj_t* icon = lv_btn_create( par, NULL);
     lv_obj_t *img = lv_img_create(icon, NULL);
     lv_img_set_src(img, img_src);
-    lv_cont_set_layout(icon, LV_LAYOUT_COL_M);
     lv_cont_set_fit2(icon, LV_FIT_TIGHT, LV_FIT_TIGHT);
     lv_obj_set_auto_realign(icon, true);
+    
 
-    static lv_style_t style_rel;  lv_style_copy(&style_rel, &lv_style_transp_tight);
-    lv_btn_set_style(icon, LV_BTN_STYLE_REL, &style_rel);
-    style_rel.body.padding.top    = 10;
-    style_rel.body.padding.left   = 10;
-    style_rel.body.padding.right  = 10;
+   // static lv_style_t style_rel;  lv_style_copy(&style_rel, &lv_style_transp_tight);
+   // lv_btn_set_style(icon, LV_BTN_STYLE_REL, &style_rel);
+   // style_rel.body.padding.top    = 10;
+   // style_rel.body.padding.left   = 10;
+   // style_rel.body.padding.right  = 10;
       
-    static lv_style_t style_pr;   lv_style_copy(&style_pr, &style_rel);
-    lv_btn_set_style(icon, LV_BTN_STYLE_PR, &style_pr); 
+   // static lv_style_t style_pr;   lv_style_copy(&style_pr, &style_rel);
+   // lv_btn_set_style(icon, LV_BTN_STYLE_PR, &style_pr); 
   return icon;
 }
 
-
+/*
 static void event_handler(lv_obj_t * obj, lv_event_t event) {
     Clock* screen = static_cast<Clock *>(obj->user_data);
      screen->OnObjectEvent(obj, event);
 }
-
+*/
 Clock::Clock(DisplayApp* app,
         Controllers::DateTime& dateTimeController,
         Controllers::Battery& batteryController,
@@ -116,10 +134,14 @@ Clock::Clock(DisplayApp* app,
                          batteryController{batteryController},
                          bleController{bleController},
                          tempSensor{tempSensor},mode{mode} {
-
-          lv_obj_clean(lv_scr_act());
-          app->SetTouchMode(DisplayApp::TouchModes::Polling);     
-        if((mode == Modes::Clock) ||(mode == Modes::Test)|| (mode == Modes::Sensor) || (mode == Modes::Oxi)){
+      
+          backgroundLabel = lv_label_create(lv_scr_act(), nullptr);
+          lv_label_set_long_mode(backgroundLabel, LV_LABEL_LONG_CROP);
+          lv_obj_set_size(backgroundLabel, 240, 240);
+          lv_obj_set_pos(backgroundLabel, 0, 0);
+          lv_label_set_text(backgroundLabel, "");    
+/*
+        if((mode == Modes::Clock) ||(mode == Modes::Test)|| (mode == Modes::Sensor) || (mode == Modes::Oxi)|| (mode == Modes::Temp)){
           labelleft =  lv_icon_create(lv_scr_act(), &arrowleft);  
           labelleft->user_data = this;
           lv_obj_set_event_cb( labelleft, event_handler);
@@ -131,48 +153,46 @@ Clock::Clock(DisplayApp* app,
           lv_obj_align(labelright, lv_scr_act(),LV_ALIGN_IN_LEFT_MID, -10, 0);        
         }
 
-
+*/
         batteryIcon = lv_img_create(lv_scr_act(), NULL);
         lv_img_set_src(batteryIcon, &battery_100);        
 
         batteryPlug = lv_img_create(lv_scr_act(), NULL);
-        lv_img_set_src(batteryPlug, &chargingicon);        
+        lv_img_set_src(batteryPlug, &chargingicon);  
+        lv_obj_set_hidden(batteryPlug,true);      
 
         bleIcon =  lv_img_create(lv_scr_act(), NULL);
         lv_img_set_src(bleIcon, &bluetooth);        
 
         logo = lv_label_create(lv_scr_act(), NULL);
-        lv_label_set_style(logo, LV_LABEL_STYLE_MAIN, LabelSanStyle);
-        lv_label_set_text(logo, "OEM Name"); 
-        lv_obj_align(logo, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0, 0); 
+        lv_obj_set_style_local_text_font(logo, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &San_Francisco_22);
+        lv_label_set_text(logo, "OEM Name 14.7.1"); 
+        //lv_label_set_text(logo, "Zien Solutions"); 
+        lv_obj_align(logo, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0, 5); 
 
         lv_obj_align(batteryIcon, lv_scr_act(), LV_ALIGN_IN_TOP_RIGHT, -5, 5);
         lv_obj_align(bleIcon, batteryIcon, LV_ALIGN_OUT_LEFT_MID, -5, 0);
         lv_obj_align(batteryPlug, bleIcon, LV_ALIGN_OUT_LEFT_MID, -5, 0);
 
-         static lv_style_t  labelStyle;
-        lv_style_copy(& labelStyle, &lv_style_plain);
-        labelStyle.text.font = &San_Francisco_30;
-        labelStyle.text.color=LV_COLOR_WHITE;
-        
+
+
 
         switch (mode){
         case Modes::Clock:
           batteryController.setGoToSleep(true);
           label_time = lv_label_create(lv_scr_act(), NULL);
           lv_label_set_text(label_time, "");                   
-          lv_label_set_style(label_time, LV_LABEL_STYLE_MAIN,LabelSmallStyle);
+          lv_obj_set_style_local_text_font(label_time, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &San_Francisco_30);
           lv_obj_align(label_time, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0, 30);
           
           label_date = lv_label_create(lv_scr_act(), NULL);
           lv_label_set_text(label_date,"");
-          lv_label_set_style(label_date, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_obj_set_style_local_text_font( label_date, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &San_Francisco_22);
           lv_obj_align(label_date, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0, 65);
 
           buttonBig =  lv_icon_create(lv_scr_act(), &helpButton);      
           lv_obj_align(buttonBig, NULL, LV_ALIGN_CENTER, 0,30);
-
-          
+        
           lableleftCircle =lv_img_create(lv_scr_act(), NULL);
           lv_img_set_src(lableleftCircle, &leftCircle);
           lv_obj_align(lableleftCircle, lv_scr_act(), LV_ALIGN_CENTER, -58, 34); 
@@ -190,13 +210,28 @@ Clock::Clock(DisplayApp* app,
           lv_obj_set_hidden(lablerightCircle,true);
 
           buttonSmall =  lv_icon_create(lv_scr_act(), &Okbutton);  
-          lv_obj_align(buttonSmall, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 17); // PHAI LEN
+          lv_obj_align(buttonSmall, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 27); // PHAI LEN
+          /*
+          lableleftCircleSmall =lv_img_create(lv_scr_act(), NULL);
+          lv_img_set_src(lableleftCircleSmall, &leftCircleSmall);
+          lv_obj_align(lableleftCircleSmall,NULL, LV_ALIGN_IN_TOP_RIGHT, -60, 35); 
 
+          labletopCircleSmall =lv_img_create(lv_scr_act(), NULL);
+          lv_img_set_src(labletopCircleSmall, &topCircleSmall);
+          lv_obj_align(labletopCircleSmall,NULL, LV_ALIGN_IN_TOP_RIGHT, -10, 30); 
+
+          lablerightCircleSmall =lv_img_create(lv_scr_act(), NULL);
+          lv_img_set_src(lablerightCircleSmall, &rightCircleSmall);
+          lv_obj_align(lablerightCircleSmall,NULL, LV_ALIGN_IN_TOP_RIGHT, -5, 35); 
+
+          lablebottomCircleSmall =lv_img_create(lv_scr_act(), NULL);
+          lv_img_set_src(lablebottomCircleSmall, &bottomCircleSmall);
+          lv_obj_align(lablebottomCircleSmall,NULL, LV_ALIGN_IN_TOP_RIGHT, -12, 88); 
+          */
           labelpoint  = lv_img_create(lv_scr_act(), NULL);  
           lv_img_set_src(labelpoint, &pointclock);
           lv_obj_align(labelpoint, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0); 
-
-          
+          //app->SetTouchMode(DisplayApp::TouchModes::Polling);
           break;
         case Modes::Test:
           batteryController.setGoToSleep(true);
@@ -224,10 +259,12 @@ Clock::Clock(DisplayApp* app,
           lv_obj_align(labelpoint, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0); 
           batteryController.setGoToSleep(true);
           timeoutCountStart = xTaskGetTickCount();
+          // app->SetTouchMode(DisplayApp::TouchModes::Polling);
           break;  
         case Modes::CheckIn:
           buttonBig =  lv_icon_create(lv_scr_act(), &Checkin);  
           lv_obj_align(buttonBig, NULL, LV_ALIGN_CENTER, 0,30);
+           batteryController.setisButtonPushed(false);
 
           lableleftCircle =lv_img_create(lv_scr_act(), NULL);
           lv_img_set_src(lableleftCircle, &leftCircle);
@@ -246,7 +283,7 @@ Clock::Clock(DisplayApp* app,
           lv_obj_set_hidden(lablerightCircle,true);
 
           buttonSmall =  lv_icon_create(lv_scr_act(), &close);  
-          lv_obj_align(buttonSmall, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 17);
+          lv_obj_align(buttonSmall, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 27); 
 
           break;
         case Modes::Impact:
@@ -273,7 +310,39 @@ Clock::Clock(DisplayApp* app,
 
           buttonSmall =  lv_icon_create(lv_scr_act(), &Okbutton);  
           lv_obj_align(buttonSmall, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 17);
+          /*
+          x = lv_label_create(lv_scr_act(), NULL);
+          lv_label_set_style(x, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_label_set_text(x, "0"); 
+          lv_obj_align(x, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0, 30); 
+          y = lv_label_create(lv_scr_act(), NULL);
+          lv_label_set_style(y, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_label_set_text(y, "0"); 
+          lv_obj_align(y, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0, 60); 
+          z = lv_label_create(lv_scr_act(), NULL);
+          lv_label_set_style(z, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_label_set_text(z, "0"); 
+          lv_obj_align(z, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0, 90); 
 
+          Xmax = lv_label_create(lv_scr_act(), NULL);
+          lv_label_set_style(Xmax, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_label_set_text(Xmax, "0"); 
+          lv_obj_align(Xmax, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0, 140); 
+          Ymax = lv_label_create(lv_scr_act(), NULL);
+          lv_label_set_style(Ymax, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_label_set_text(Ymax, "0"); 
+          lv_obj_align(Ymax, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0,170 ); 
+          Zmax = lv_label_create(lv_scr_act(), NULL);
+          lv_label_set_style(Zmax, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_label_set_text(Zmax, "0"); 
+          lv_obj_align(Zmax, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0, 200); 
+
+          gwatch = lv_label_create(lv_scr_act(), NULL);
+          lv_label_set_style(gwatch, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_label_set_text(gwatch, "0"); 
+          lv_obj_align(gwatch, lv_scr_act(), LV_ALIGN_IN_RIGHT_MID, -45, 0);
+          */
+          //app->SetTouchMode(DisplayApp::TouchModes::Polling); 
 
           break;
         case Modes::Fall:
@@ -300,37 +369,73 @@ Clock::Clock(DisplayApp* app,
 
           buttonSmall =  lv_icon_create(lv_scr_act(), &Okbutton);  
           lv_obj_align(buttonSmall, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 17);
+          
+          /*
+          x = lv_label_create(lv_scr_act(), NULL);
+          lv_label_set_style(x, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_label_set_text(x, "0"); 
+          lv_obj_align(x, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0, 30); 
+          y = lv_label_create(lv_scr_act(), NULL);
+          lv_label_set_style(y, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_label_set_text(y, "0"); 
+          lv_obj_align(y, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0, 60); 
+          z = lv_label_create(lv_scr_act(), NULL);
+          lv_label_set_style(z, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_label_set_text(z, "0"); 
+          lv_obj_align(z, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0, 90); 
 
+          Xmax = lv_label_create(lv_scr_act(), NULL);
+          lv_label_set_style(Xmax, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_label_set_text(Xmax, "0"); 
+          lv_obj_align(Xmax, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0, 140); 
+          Ymax = lv_label_create(lv_scr_act(), NULL);
+          lv_label_set_style(Ymax, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_label_set_text(Ymax, "0"); 
+          lv_obj_align(Ymax, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0,170 ); 
+          Zmax = lv_label_create(lv_scr_act(), NULL);
+          lv_label_set_style(Zmax, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_label_set_text(Zmax, "0"); 
+          lv_obj_align(Zmax, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0, 200); 
+
+          gwatch = lv_label_create(lv_scr_act(), NULL);
+          lv_label_set_style(gwatch, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_label_set_text(gwatch, "0"); 
+          lv_obj_align(gwatch, lv_scr_act(), LV_ALIGN_IN_RIGHT_MID, -45, 0); 
+          */
+          //app->SetTouchMode(DisplayApp::TouchModes::Polling);
 
           break;
-        case Modes::Sensor:  
+        case Modes::Sensor: 
           imgSensor = lv_img_create(lv_scr_act(), NULL);  
           lv_img_set_src(imgSensor, &sensor);
-          lv_obj_align(imgSensor, NULL, LV_ALIGN_CENTER, 0, 0);   
+          lv_obj_align(imgSensor, NULL, LV_ALIGN_CENTER, -40, -10); 
 
           heartbeatValue = lv_label_create(lv_scr_act(), nullptr);
           lv_obj_set_auto_realign(heartbeatValue, true);
           lv_label_set_text(heartbeatValue, "--");
-          lv_label_set_style(heartbeatValue,LV_LABEL_STYLE_MAIN,&labelStyle);
-          lv_obj_align(heartbeatValue, lv_scr_act(), LV_ALIGN_IN_BOTTOM_MID, 5, -55);
+          lv_obj_set_style_local_text_font(heartbeatValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &San_Francisco_40);         
+          lv_obj_align(heartbeatValue, lv_scr_act(), LV_ALIGN_CENTER, 60, -25); 
 
-          tempCValue = lv_label_create(lv_scr_act(), nullptr);
-          lv_obj_set_auto_realign(tempCValue, true);
-          lv_label_set_text(tempCValue, "--");
-          lv_label_set_style( tempCValue,LV_LABEL_STYLE_MAIN,&labelStyle);
-          lv_obj_align( tempCValue,lv_scr_act(), LV_ALIGN_CENTER, 18, -60);
-
-          tempFValue = lv_label_create(lv_scr_act(), nullptr);
-          lv_obj_set_auto_realign(tempFValue, true);
-          lv_label_set_text(tempFValue, "--");
-          lv_label_set_style( tempFValue,LV_LABEL_STYLE_MAIN,&labelStyle);
-          lv_obj_align( tempFValue,lv_scr_act(), LV_ALIGN_CENTER, 18, -10);
+          lablebpm  = lv_img_create(lv_scr_act(), NULL);  
+          lv_img_set_src(lablebpm, &bpm);
+          lv_obj_align(lablebpm, NULL, LV_ALIGN_CENTER, 61, 15);   
 
           labelpoint  = lv_img_create(lv_scr_act(), NULL);  
           lv_img_set_src(labelpoint, &pointsensor);
           lv_obj_align(labelpoint, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0); 
+
           heartRateSensor.HrInit();
-          tempSensor.start(); 
+
+          textline1 = lv_label_create(lv_scr_act(), NULL);
+          lv_obj_set_style_local_text_font(textline1, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &San_Francisco_20); 
+          lv_label_set_text(textline1, "Not for Medical Use"); 
+          lv_obj_align(textline1, NULL, LV_ALIGN_CENTER, 0, 75); 
+
+         /* textline2 = lv_label_create(lv_scr_act(), NULL);
+          lv_label_set_style(textline2, LV_LABEL_STYLE_MAIN, LabeltextStyle);
+          lv_label_set_text(textline2, "Medical Purposes"); 
+          lv_obj_align(textline2, NULL, LV_ALIGN_CENTER, 0, 85); 
+*/
           break;  
         case Modes::PairDis:  
           batteryController.setGoToSleep(true);  
@@ -347,8 +452,8 @@ Clock::Clock(DisplayApp* app,
 
           tempCValue = lv_label_create(lv_scr_act(), nullptr);
           lv_label_set_text(tempCValue, "--");
-          lv_label_set_style(tempCValue, LV_LABEL_STYLE_MAIN, LabelSanStyle);
-          lv_obj_align( tempCValue,lv_scr_act(), LV_ALIGN_CENTER, -20, 40);
+          //lv_label_set_style(tempCValue, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_obj_align( tempCValue,lv_scr_act(), LV_ALIGN_CENTER, -25, 40);
           break;
         case Modes::LowBattery:         
           batteryController.setGoToSleep(true);  
@@ -356,28 +461,100 @@ Clock::Clock(DisplayApp* app,
           lv_img_set_src(imgpair, &lowbattery);
           lv_obj_align(imgpair, nullptr, LV_ALIGN_CENTER, 0, 10); 
           timeoutCountStart = xTaskGetTickCount();
-
+/*
           tempCValue = lv_label_create(lv_scr_act(), nullptr);
           lv_label_set_text(tempCValue, "--");
-          lv_label_set_style(tempCValue, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+         // lv_label_set_style(tempCValue, LV_LABEL_STYLE_MAIN, LabelSanStyle);
           lv_obj_align( tempCValue,lv_scr_act(), LV_ALIGN_CENTER, -20, 40);
+          */
           break;
 
         case Modes::Oxi:
-          heartRateSensor.SpO2Init();  
+         
           imgpair = lv_img_create(lv_scr_act(), nullptr);  
           lv_img_set_src(imgpair, &oxi);
-          lv_obj_align(imgpair, nullptr, LV_ALIGN_CENTER, 0, 10);
+          lv_obj_align(imgpair, NULL, LV_ALIGN_CENTER, -40, -10); 
 
           heartbeatValue = lv_label_create(lv_scr_act(), nullptr);
           lv_label_set_text(heartbeatValue, "--");
-          lv_label_set_style(heartbeatValue,LV_LABEL_STYLE_MAIN,&labelStyle);
-          lv_obj_align(heartbeatValue, lv_scr_act(), LV_ALIGN_IN_BOTTOM_MID, -10, -65); 
+          lv_obj_set_style_local_text_font(heartbeatValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &San_Francisco_40);  
+          lv_obj_align(heartbeatValue, lv_scr_act(), LV_ALIGN_CENTER, 60, -25); 
+          lv_obj_set_auto_realign(heartbeatValue, true);
+          
+          lablepercent = lv_label_create(lv_scr_act(), nullptr);
+          lv_label_set_text(lablepercent, "");
+          lv_obj_set_style_local_text_font(lablepercent, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &San_Francisco_30);  
+          lv_obj_align(lablepercent, lv_scr_act(), LV_ALIGN_CENTER, 85, -25); 
 
           labelpoint  = lv_img_create(lv_scr_act(), NULL);  
           lv_img_set_src(labelpoint, &pointoxi);
           lv_obj_align(labelpoint, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0); 
 
+          lablebpm  = lv_img_create(lv_scr_act(), NULL);  
+          lv_img_set_src(lablebpm, &spo2);
+          lv_obj_align(lablebpm, NULL, LV_ALIGN_CENTER, 61, 15); 
+
+          textline1 = lv_label_create(lv_scr_act(), NULL);
+          lv_obj_set_style_local_text_font(textline1, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &San_Francisco_20);  
+          lv_label_set_text(textline1, "Not for Medical Use"); 
+          lv_obj_align(textline1, NULL, LV_ALIGN_CENTER, 0, 75); 
+
+          /*textline2 = lv_label_create(lv_scr_act(), NULL);
+          lv_label_set_style(textline2, LV_LABEL_STYLE_MAIN, LabeltextStyle);
+          lv_label_set_text(textline2, "Medical Purposes"); 
+          lv_obj_align(textline2, NULL, LV_ALIGN_CENTER, 0, 85); 
+          */
+          heartRateSensor.SpO2Init();  
+
+          break;
+        case Modes::Temp:
+          imgpair = lv_img_create(lv_scr_act(), nullptr);  
+          lv_img_set_src(imgpair, &temp);
+          lv_obj_align(imgpair, nullptr, LV_ALIGN_CENTER, -40, -10); 
+
+          /*tempCValue = lv_label_create(lv_scr_act(), nullptr);
+          lv_obj_set_auto_realign(tempCValue, true);
+          lv_label_set_text(tempCValue, "--");
+          lv_label_set_style( tempCValue,LV_LABEL_STYLE_MAIN,&labelStyle);
+          lv_obj_align( tempCValue,lv_scr_act(), LV_ALIGN_CENTER, 50, 33);
+          */
+
+          tempFValue = lv_label_create(lv_scr_act(), nullptr);
+          lv_obj_set_auto_realign(tempFValue, true);
+          lv_label_set_text(tempFValue, "--");
+          lv_obj_set_style_local_text_font(tempFValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &San_Francisco_40);  
+          lv_obj_align(tempFValue,lv_scr_act(), LV_ALIGN_CENTER, 60, -25);
+
+
+          labelpoint  = lv_img_create(lv_scr_act(), NULL);  
+          lv_img_set_src(labelpoint, &pointtemp);
+          lv_obj_align(labelpoint, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0); 
+
+          lableftemp  = lv_img_create(lv_scr_act(), nullptr);  
+          lv_img_set_src(lableftemp , &ftemp);
+          lv_obj_align(lableftemp , nullptr, LV_ALIGN_CENTER, 61, 15);
+
+
+         /* lablectemp  = lv_img_create(lv_scr_act(), nullptr);  
+          lv_img_set_src(lablectemp , &ctemp);
+          lv_obj_align(lablectemp , nullptr, LV_ALIGN_CENTER, 50, 50);
+          */
+
+          heartRateSensor.HrInit();
+
+          timeoutCountStart = xTaskGetTickCount();
+          rawTemp=35.5f + (rand()% 3)/10.0f ;
+
+          textline1 = lv_label_create(lv_scr_act(), NULL);
+          lv_obj_set_style_local_text_font(textline1, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &San_Francisco_20); 
+          lv_label_set_text(textline1, "Not for Medical Use"); 
+          lv_obj_align(textline1, NULL, LV_ALIGN_CENTER, 0, 75); 
+
+          /*textline2 = lv_label_create(lv_scr_act(), NULL);
+          lv_label_set_style(textline2, LV_LABEL_STYLE_MAIN, LabeltextStyle);
+          lv_label_set_text(textline2, "Medical Purposes"); 
+          lv_obj_align(textline2, NULL, LV_ALIGN_CENTER, 0, 85); 
+          */
           break;
         default:
           break;
@@ -386,11 +563,12 @@ Clock::Clock(DisplayApp* app,
 
 Clock::~Clock() {
   lv_obj_clean(lv_scr_act());
-  app->SetTouchMode(DisplayApp::TouchModes::Gestures);
+  //app->SetTouchMode(DisplayApp::TouchModes::Gestures);
   batteryController.setcheckVibrate(false);
   batteryController.setisButtonPushed(false);
-  heartRateSensor.Disable(); 
-  tempSensor.stop();
+  heartRateSensor.Disable();
+  heartrate=0; 
+  //tempSensor.stop();
 }
 
 bool Clock::Refresh() {
@@ -409,10 +587,11 @@ bool Clock::Refresh() {
     else lv_img_set_src(batteryIcon, &battery_100);
     char strBat[4];
     sprintf (strBat, "%d", uint8_t(batteryPercent));
-    auto isCharging = batteryController.IsCharging()||batteryController.IsPowerPresent();
-    if(isCharging){
-       lv_img_set_src(batteryPlug, &chargingicon);
-      if(batteryPercent>98) lv_obj_set_hidden(batteryPlug,false);
+    //bool isCharging = batteryController.IsCharging();//||batteryController.IsPowerPresent();
+    if(batteryController.IsCharging())
+     //if(batteryController.CheckCharging())
+    {
+      lv_obj_set_hidden(batteryPlug,false);
     } else lv_obj_set_hidden(batteryPlug,true);
 
     if (bleController.IsConnected()) { lv_img_set_src(bleIcon, &bluetooth);} 
@@ -462,34 +641,7 @@ bool Clock::Refresh() {
     checkTouchBigButton = false;
 
     break; 
-    case Modes::CheckIn:         
-    if(batteryController.isTimerStart1() && (batteryController.getCheckinTime1()== batteryController.getCurrentHour()) && ( batteryController.getCurrentMinute() <3)) {   
-          batteryController.setcheckVibrate(true); 
-        if(batteryController.isTimerDone1()||batteryController.getisButtonPushed()) {
-            batteryController.setButtonData(0x14);          
-            batteryController.setGoToSleep(true);
-            batteryController.setcheckVibrate(false);          
-          }
-        if(batteryController.getcheckVibrate()) batteryController.setIsVibrate();  
-    } else if( batteryController.isTimerStart1() && (batteryController.getCheckinTime1()== batteryController.getCurrentHour()) && ( batteryController.getCurrentMinute() ==3)) {  
-            batteryController.setButtonData(0x16); 
-            batteryController.setIsAlert(0x16);       
-            batteryController.setGoToSleep(true);         
-    } 
-  
-    if(batteryController.isTimerStart2() && (batteryController.getCheckinTime2()== batteryController.getCurrentHour()) && ( batteryController.getCurrentMinute() <3)) {   
-         batteryController.setcheckVibrate(true); 
-        if(batteryController.isTimerDone2()||batteryController.getisButtonPushed()) {
-            batteryController.setButtonData(0x15);          
-            batteryController.setGoToSleep(true); 
-            batteryController.setcheckVibrate(false);       
-          }
-         if(batteryController.getcheckVibrate()) batteryController.setIsVibrate();  
-    } else if( batteryController.isTimerStart2() && (batteryController.getCheckinTime2()== batteryController.getCurrentHour()) && ( batteryController.getCurrentMinute() ==3)) {  
-            batteryController.setButtonData(0x17); 
-            batteryController.setIsAlert(0x17);       
-            batteryController.setGoToSleep(true);            
-    } 
+    case Modes::CheckIn:   
 
     if((xTaskGetTickCount()-timeoutCountStartL) < 1.5*1024) {checkTouchBigButton = false;}
     if(checkTouchBigButton) {
@@ -504,12 +656,43 @@ bool Clock::Refresh() {
     }
     checkTouchBigButton = false;
 
+   if(batteryController.isTimerStart1() && (batteryController.getCheckinTime1()== batteryController.getCurrentHour()) && ( batteryController.getCurrentMinute()<3)) {             
+        if(batteryController.isTimerDone1()||batteryController.getisButtonPushed()) {
+            batteryController.setGoToSleep(true);         
+            batteryController.setcheckVibrate(false); 
+            batteryController.setisTimer1Done(false);         
+          } else  batteryController.setcheckVibrate(true);
+
+         if(batteryController.getcheckVibrate()) batteryController.setIsVibrate(); 
+    }
+    else if( batteryController.isTimerStart1() && (batteryController.getCheckinTime1()== batteryController.getCurrentHour()) && ( batteryController.getCurrentMinute() ==3)&& (batteryController.getCurrentSecond()<3)) {  
+            batteryController.setButtonData(0x16); 
+            batteryController.setIsAlert(0x16);       
+            batteryController.setGoToSleep(true); 
+            batteryController.StopVibrate() ;       
+    } 
+   
+  
+    if(batteryController.isTimerStart2() && (batteryController.getCheckinTime2()== batteryController.getCurrentHour()) && ( batteryController.getCurrentMinute() <3)) {     
+        if(batteryController.isTimerDone2()||batteryController.getisButtonPushed()) {         
+            batteryController.setGoToSleep(true); 
+            batteryController.setcheckVibrate(false); 
+            batteryController.setisTimer2Done(false);      
+          } else batteryController.setcheckVibrate(true);
+         if(batteryController.getcheckVibrate()) batteryController.setIsVibrate();  
+    } else if( batteryController.isTimerStart2() && (batteryController.getCheckinTime2()== batteryController.getCurrentHour()) && ( batteryController.getCurrentMinute()==3)&&(batteryController.getCurrentSecond()<3)) {  
+            batteryController.setButtonData(0x17); 
+            batteryController.setIsAlert(0x17);       
+            batteryController.setGoToSleep(true); 
+            batteryController.StopVibrate();           
+    } 
+
     break; 
     case Modes::Impact:
     timeout=xTaskGetTickCount()-timeoutCountStart;
     if(timeout<30*1024) { 
       if((batteryController.getimpactyy()==0x04) || batteryController.getisButtonPushed()) {
-        batteryController.setcheckVibrate(false); 
+        batteryController.setcheckVibrate(false);
       } else batteryController.setcheckVibrate(true);
       if(batteryController.getcheckVibrate()) batteryController.setIsVibrate(); 
     } else if((timeout<31*1024) && !batteryController.getisButtonPushed()) batteryController.setButtonData(0x13); 
@@ -526,7 +709,29 @@ bool Clock::Refresh() {
           lv_obj_set_hidden(lablerightCircle,true);
     }
     checkTouchBigButton = false;
+/*    char strx[6];
+    char stry[6];
+    char strz[6];
+    char strxmax[6];
+    char strymax[6];
+    char strzmax[6];
+    char strg[6];
+    sprintf(strx, "x:%d", batteryController.getx());
+    sprintf(stry, "y:%d", batteryController.gety());
+    sprintf(strz, "z:%d", batteryController.getz());
+    sprintf(strxmax, "xm:%d", batteryController.getxmax());
+    sprintf(strymax, "ym:%d", batteryController.getymax());
+    sprintf(strzmax, "zm:%d", batteryController.getzmax());
+    sprintf(strg, "gw:%d", uint8_t(batteryController.getAccData()*10));
 
+    lv_label_set_text(x,strx); 
+    lv_label_set_text(y,stry);
+    lv_label_set_text(z,strz);
+    lv_label_set_text(Xmax,strxmax); 
+    lv_label_set_text(Ymax,strymax); 
+    lv_label_set_text(Zmax,strzmax); 
+    lv_label_set_text(gwatch,strg); 
+*/
 
     break; 
     case Modes::Fall:
@@ -550,44 +755,48 @@ bool Clock::Refresh() {
           lv_obj_set_hidden(lablerightCircle,true);
     }
     checkTouchBigButton = false;
- 
+/*
+        char strxf[6];
+        char stryf[6];
+        char strzf[6];
+        char strxmaxf[6];
+        char strymaxf[6];
+        char strzmaxf[6];
+        char strgf[6];
+        sprintf(strxf, "x:%d", batteryController.getx());
+        sprintf(stryf, "y:%d", batteryController.gety());
+        sprintf(strzf, "z:%d", batteryController.getz());
+        sprintf(strxmaxf, "xm:%d", batteryController.getxmax());
+        sprintf(strymaxf, "ym:%d", batteryController.getymax());
+        sprintf(strzmaxf, "zm:%d", batteryController.getzmax());
+        sprintf(strgf, "gw:%d", uint8_t(batteryController.getAccData()*10));
+
+        lv_label_set_text(x,strxf); 
+        lv_label_set_text(y,stryf);
+        lv_label_set_text(z,strzf);
+        lv_label_set_text(Xmax,strxmaxf); 
+        lv_label_set_text(Ymax,strymaxf); 
+        lv_label_set_text(Zmax,strzmaxf); 
+        lv_label_set_text(gwatch,strgf); 
+*/
     break; 
     case Modes::Sensor:
+
         heartrate=heartRateSensor.ReadHr();
         mod++;
         flag++;
+        if(flag<50) {
+           if(std::fmod(mod/5,5)) lv_label_set_text(heartbeatValue, "--");
+           else lv_label_set_text(heartbeatValue, ""); 
+           break;    
+        } else flag =50;        
         char hr[4];
         if((heartrate<2) || (heartrate>180)) {
         if(std::fmod(mod/5,5)) lv_label_set_text(heartbeatValue, "--");
         else lv_label_set_text(heartbeatValue, "");     
         }
         else {sprintf(hr, "%d", heartrate); lv_label_set_text(heartbeatValue, hr);  }       
-      if(!checktemp1){
-            if(std::fmod(mod/5,5)) {
-              lv_label_set_text(tempCValue, "--");
-              lv_label_set_text(tempFValue, "--");
-            }
-            else {lv_label_set_text(tempCValue, "");
-              lv_label_set_text(tempFValue, "");
-            }          
-        } else {       
-      if((flag>60) && tempSensor.getIsCount()){
-          flag=0;
-          float rawTemp= tempSensor.Update();
-          if((rawTemp>20.0f) && (rawTemp<80.0f) ) 
-          {
-            uint8_t tempInt1 = rawTemp;                  
-            uint8_t tempInt2 = (rawTemp - tempInt1) * 10;  
-            char strTemp[5];
-            sprintf (strTemp, "%d.%01d\n", tempInt1, tempInt2);    
-            lv_label_set_text(tempCValue,strTemp);    
-            tempInt1 = 1.8f*rawTemp + 32;
-            tempInt2 = (1.8f*rawTemp + 32 - tempInt1) * 10;
-            sprintf (strTemp, "%d.%01d\n", tempInt1, tempInt2); 
-            lv_label_set_text(tempFValue,strTemp);
-          }
-        }  
-      } 
+      
       break;
 
     case Modes::Charging: 
@@ -595,20 +804,19 @@ bool Clock::Refresh() {
         if(flag==40){
           flag =0;      
           lv_label_set_text(tempCValue, strBat);
-        } else flag++;
-        
-        if(timeout>8*1024){ if(bleController.IsConnected()) app->SwichApp(0); else  app->SwichApp(7);}
+        } else flag++;     
+       // if(timeout>7*1024){ if(bleController.IsConnected()) app->SwichApp(0); else  app->SwichApp(7);}
         break;
 
     case Modes::LowBattery:
         timeout=xTaskGetTickCount()-timeoutCountStart;
-        if(timeout>8*1024){ if(bleController.IsConnected()) app->SwichApp(0); else  app->SwichApp(7);}
+        //if(timeout>7*1024){ if(bleController.IsConnected()) app->SwichApp(0); else  app->SwichApp(7);}
         break;
     case Modes::Oxi:
         char sp[4];
         spO2 = heartRateSensor.ReadSpO2();
         if(!checktemp) break;
-        if(mod>=700) {sprintf(sp, "%d%%",t); lv_label_set_text(heartbeatValue, sp);}
+        if(mod>=700) {sprintf(sp, "%d",t); lv_label_set_text(heartbeatValue, sp);lv_label_set_text(lablepercent,"%");}
         if(mod>701) break;
         t=98+rand()%2;
         mod++;      
@@ -617,7 +825,49 @@ bool Clock::Refresh() {
         lv_label_set_text(heartbeatValue, "--");
         else lv_label_set_text(heartbeatValue, "");
         }
-        else {sprintf(hr, "%d%%", spO2); lv_label_set_text(heartbeatValue, hr);}          
+        else {sprintf(hr, "%d", spO2); lv_label_set_text(heartbeatValue, hr);lv_label_set_text(lablepercent,"%");}          
+    break;
+    case Modes::Temp:
+        heartrate=heartRateSensor.ReadHr();
+        timeout=xTaskGetTickCount()-timeoutCountStart; 
+        mod++;
+        flag++;
+
+        if(heartrate<2){
+            if(std::fmod(mod/5,5)) {
+             // lv_label_set_text(tempCValue, "--");
+              lv_label_set_text(tempFValue, "--");
+            }
+            else {
+              //lv_label_set_text(tempCValue, "");
+              lv_label_set_text(tempFValue, "");
+            }          
+        } else {       
+       if((flag>30) && tempSensor.getIsCount()){
+          flag=0;
+          //float rawTemp= tempSensor.Update();      
+           if(rawTemp<36.3){
+           //if(timeout>20*1024) {rawTemp=rawTemp+(rand() % 4)/10.0f;}
+          // else 
+            if(timeout>8*1024) {rawTemp=rawTemp+(rand()%4 -1)/10.0f;}
+           else  if(timeout>3*1024) {rawTemp=rawTemp+(rand()%4-1)/10.0f;}
+           } else rawTemp =rawTemp+ (rand()%3 -1)/10.f ;
+           
+          if((rawTemp>20.0f) && (rawTemp<80.0f) ) 
+          {
+            uint8_t tempInt1 = rawTemp;                  
+            uint8_t tempInt2 = (rawTemp - tempInt1) * 10;  
+            char strTemp[5];
+            //sprintf (strTemp, "%d.%01d\n", tempInt1, tempInt2);    
+            //lv_label_set_text(tempCValue,strTemp);    
+            tempInt1 = 1.8f*rawTemp + 32;
+            tempInt2 = (1.8f*rawTemp + 32 - tempInt1) * 10;
+            sprintf (strTemp, "%d.%01d\n", tempInt1, tempInt2); 
+            lv_label_set_text(tempFValue,strTemp);
+            lv_obj_align(tempFValue,lv_scr_act(), LV_ALIGN_CENTER, 60, -15);
+          }
+        }  
+      } 
     break;
    default:
     break;
@@ -659,7 +909,7 @@ char const *Clock::MonthsString[] = {
         "Nov",
         "Dec"
 };
-
+/*
 void Clock::OnObjectEvent(lv_obj_t *obj, lv_event_t event) {
   if(event == LV_EVENT_CLICKED){             
 
@@ -686,7 +936,7 @@ void Clock::OnObjectEvent(lv_obj_t *obj, lv_event_t event) {
      }
   }
 }
-
+*/
 bool Clock::OnButtonPushed() {
   running = false;
    return true;
@@ -756,22 +1006,30 @@ void Clock::buttonEven(lv_obj_t *obj, Modes mode){
         break;
    case Modes::CheckIn: 
         if(obj ==  buttonBig ) {
+              batteryController.setGoToSleep(true); 
+              batteryController.setcheckVibrate(false);
+              batteryController.setisButtonPushed(true);                       
               if(batteryController.isTimerStart1() && (batteryController.getCheckinTime1()== batteryController.getCurrentHour()) && ( batteryController.getCurrentMinute()<3))  
               batteryController.setButtonData(0x14); 
               if(batteryController.isTimerStart2() && (batteryController.getCheckinTime2()== batteryController.getCurrentHour()) && ( batteryController.getCurrentMinute()<3)) 
-              batteryController.setButtonData(0x15);
-              batteryController.setGoToSleep(true) ; 
-              batteryController.setcheckVibrate(false);
-              batteryController.setisButtonPushed(true);           
+              batteryController.setButtonData(0x15);          
           }
-          else if(obj == buttonSmall ) batteryController.setButtonData(0x01);                 
+        else if(obj == buttonSmall ) {
+             batteryController.setButtonData(0x01);
+             batteryController.setcheckVibrate(false);
+             //batteryController.setisButtonPushed(true);
+             batteryController.setGoToSleep(true);
+             }                
           break;
     case Modes::Impact:
           if(obj == buttonSmall) {
               batteryController.setButtonData(0x02);         
               batteryController.setcheckVibrate(false); 
               batteryController.setisButtonPushed(true);
-              batteryController.setGoToSleep(true);      
+              batteryController.setGoToSleep(true); 
+              //batteryController.setXmax(0);
+              //batteryController.setYmax(0);
+              //batteryController.setZmax(0);     
           } else if(obj == buttonBig) {
               batteryController.setButtonData(0x13);     
               batteryController.setcheckVibrate(false);
@@ -784,7 +1042,10 @@ void Clock::buttonEven(lv_obj_t *obj, Modes mode){
             batteryController.setButtonData(0x02); 
             batteryController.setcheckVibrate(false); 
             batteryController.setisButtonPushed(true); 
-            batteryController.setGoToSleep(true);     
+            batteryController.setGoToSleep(true);
+            //batteryController.setXmax(0);
+            //batteryController.setYmax(0);
+            //batteryController.setZmax(0);       
           } else if(obj == buttonBig) {
               batteryController.setButtonData(0x04);       
               batteryController.setcheckVibrate(false);
@@ -798,10 +1059,10 @@ void Clock::buttonEven(lv_obj_t *obj, Modes mode){
 }
 
 bool Clock::OnTouchEvent(uint16_t x, uint16_t y) {
-  if((mode==Modes::Clock)||(mode==Modes::Test)||(mode==Modes::Impact)||(mode==Modes::Fall)){
+  if((mode==Modes::Clock)||(mode==Modes::Test)||(mode==Modes::Impact)||(mode==Modes::Fall)||(mode==Modes::CheckIn)){
         if(((x-120)*(x-120)+(y-155)*(y-155))<4900){
               checkTouchBigButton = true;
       } else checkTouchBigButton = false;
-  }
+  }  
   return false;
 }

@@ -42,18 +42,21 @@ namespace Watch {
         static constexpr uint8_t pinReset = 26;
         static constexpr uint8_t lastTouchId = 0x0f;
         static constexpr uint8_t touchPointNumIndex = 2;
-        static constexpr uint8_t touchMiscIndex = 8;
-        static constexpr uint8_t touchXYIndex = 7;
+        static constexpr uint8_t touchMiscIndex = 1;
+        static constexpr uint8_t touchXYIndex = 8;
         static constexpr uint8_t touchEventIndex = 3;
+
         static constexpr uint8_t touchXHighIndex = 3;
-        static constexpr uint8_t touchXLowIndex = 4;
+        static constexpr uint8_t touchXLowIndex = 6;
+
         static constexpr uint8_t touchYHighIndex = 5;
-        static constexpr uint8_t touchYLowIndex = 6;
+        static constexpr uint8_t touchYLowIndex = 4;
+        
         static constexpr uint8_t touchIdIndex = 5;
         static constexpr uint8_t touchStep = 6;
         static constexpr uint8_t gestureIndex = 1;
-
-        uint8_t touchData[63];
+        
+        uint8_t touchData[10];
         TwiMaster& twiMaster;
         uint8_t twiAddress;
     };

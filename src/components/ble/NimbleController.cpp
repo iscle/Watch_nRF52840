@@ -14,6 +14,7 @@
 #include "components/ble/NotificationManager.h"
 #include "components/datetime/DateTimeController.h"
 #include "systemtask/SystemTask.h"
+#include "SEGGER_RTT.h" 
 
 
 using namespace Watch::Controllers;
@@ -37,6 +38,7 @@ NimbleController::NimbleController(Watch::System::SystemTask& systemTask,
         //musicService{systemTask},
         //batteryInformationService{batteryController},
         keyfob{batteryController},
+        heartRateService{systemTask,batteryController},
         //dataSensor{batteryController},
         //appService{batteryController},
         //immediateAlertService{systemTask, notificationManager},
@@ -62,7 +64,7 @@ void NimbleController::Init() {
   //batteryInformationService.Init();
   //immediateAlertService.Init();
   keyfob.Init();
-  //dataSensor.Init();
+  heartRateService.Init();
   int res;
   res = ble_hs_util_ensure_addr(0);
   ASSERT(res == 0);
@@ -74,25 +76,34 @@ void NimbleController::Init() {
   bleController.AddressType((addrType == 0) ? Ble::AddressTypes::Public : Ble::AddressTypes::Random);
   bleController.Address(std::move(address));
 
-  res = ble_gatts_start();
-  ASSERT(res == 0);
   auto& bleAddr = bleController.Address();
-  
   sprintf(deviceName, "SA%02x%02x%02x",bleAddr[2], bleAddr[1], bleAddr[0]);
   res = ble_svc_gap_device_name_set(deviceName);
-    ASSERT(res == 0); 
+  ASSERT(res == 0);
+
+  res = ble_gatts_start();
+  ASSERT(res == 0);
   }
 
 
 void NimbleController::ble_checkevent()
 {
   keyfob.ble_checkevent();
-  //dataSensor.ble_checkevent();
+  heartRateService.OnNewHeartRateValue();
 }
+
+void NimbleController::ble_acc_checkevent()
+{
+  heartRateService.OnNewHeartRateValue();
+}
+
+
 
 void NimbleController::StartAdvertising() {
   if(bleController.IsConnected() || ble_gap_conn_active() || ble_gap_adv_active()) return;
+
   ble_svc_gap_device_name_set(deviceName);
+
   /* set adv parameters */
   struct ble_gap_adv_params adv_params;
   struct ble_hs_adv_fields fields;
@@ -122,12 +133,11 @@ void NimbleController::StartAdvertising() {
   rsp_fields.name = (uint8_t *)deviceName;
   rsp_fields.name_len = strlen(deviceName);
   rsp_fields.name_is_complete = 1;
-
   ble_gap_adv_set_fields(&fields);
-//  ASSERT(res == 0); // TODO this one sometimes fails with error 22 (notsync)
+  //ASSERT(res == 0); // TODO this one sometimes fails with error 22 (notsync)
 
   ble_gap_adv_rsp_set_fields(&rsp_fields);
-//  ASSERT(res == 0);
+  //ASSERT(res == 0);
 
   ble_gap_adv_start(addrType, NULL, BLE_HS_FOREVER,
                           &adv_params, GAPEventCallback, this);
@@ -142,15 +152,15 @@ void NimbleController::StartAdvertising() {
 int NimbleController::OnGAPEvent(ble_gap_event *event) {
   switch (event->type) {
     case BLE_GAP_EVENT_ADV_COMPLETE:
-      NRF_LOG_INFO("Advertising event : BLE_GAP_EVENT_ADV_COMPLETE");
-      NRF_LOG_INFO("advertise complete; reason=%dn status=%d", event->adv_complete.reason, event->connect.status);
+     // NRF_LOG_INFO("Advertising event : BLE_GAP_EVENT_ADV_COMPLETE");
+    //  NRF_LOG_INFO("advertise complete; reason=%dn status=%d", event->adv_complete.reason, event->connect.status);
       break;
     case BLE_GAP_EVENT_CONNECT: {
-      NRF_LOG_INFO("Advertising event : BLE_GAP_EVENT_CONNECT");
+    //  NRF_LOG_INFO("Advertising event : BLE_GAP_EVENT_CONNECT");
 
       /* A new connection was established or a connection attempt failed. */
-      NRF_LOG_INFO("connection %s; status=%d ", event->connect.status == 0 ? "established" : "failed",
-                   event->connect.status);
+    //  NRF_LOG_INFO("connection %s; status=%d ", event->connect.status == 0 ? "established" : "failed",
+     //              event->connect.status);
 
       if (event->connect.status != 0) {
         /* Connection failed; resume advertising. */
@@ -183,23 +193,23 @@ int NimbleController::OnGAPEvent(ble_gap_event *event) {
       break;
     case BLE_GAP_EVENT_ENC_CHANGE:
       /* Encryption has been enabled or disabled for this connection. */
-      NRF_LOG_INFO("encryption change event; status=%d ", event->enc_change.status);
+     // NRF_LOG_INFO("encryption change event; status=%d ", event->enc_change.status);
       return 0;
     case BLE_GAP_EVENT_SUBSCRIBE:
-      NRF_LOG_INFO("subscribe event; conn_handle=%d attr_handle=%d "
+    /*  NRF_LOG_INFO("subscribe event; conn_handle=%d attr_handle=%d "
                         "reason=%d prevn=%d curn=%d previ=%d curi=???\n",
                   event->subscribe.conn_handle,
                   event->subscribe.attr_handle,
                   event->subscribe.reason,
                   event->subscribe.prev_notify,
                   event->subscribe.cur_notify,
-                  event->subscribe.prev_indicate);
+                  event->subscribe.prev_indicate);*/
       return 0;
       case BLE_GAP_EVENT_MTU:
-     NRF_LOG_INFO("mtu update event; conn_handle=%d cid=%d mtu=%d\n",
+     /*NRF_LOG_INFO("mtu update event; conn_handle=%d cid=%d mtu=%d\n",
                   event->mtu.conn_handle,
                   event->mtu.channel_id,
-                  event->mtu.value);
+                  event->mtu.value);*/
       return 0;
     case BLE_GAP_EVENT_REPEAT_PAIRING: {
       /* We already have a bond with the peer, but it is attempting to
@@ -219,9 +229,9 @@ int NimbleController::OnGAPEvent(ble_gap_event *event) {
 
     case BLE_GAP_EVENT_NOTIFY_RX: {
       /* Peer sent us a notification or indication. */
-      size_t notifSize = OS_MBUF_PKTLEN(event->notify_rx.om);
+     // size_t notifSize = OS_MBUF_PKTLEN(event->notify_rx.om);
 
-      NRF_LOG_INFO("received %s; conn_handle=%d attr_handle=%d "
+    /*  NRF_LOG_INFO("received %s; conn_handle=%d attr_handle=%d "
                    "attr_len=%d",
                    event->notify_rx.indication ?
                    "indication" :
@@ -229,7 +239,7 @@ int NimbleController::OnGAPEvent(ble_gap_event *event) {
                    event->notify_rx.conn_handle,
                    event->notify_rx.attr_handle,
                    notifSize);
-
+*/
       //alertNotificationClient.OnNotification(event);
       return 0;
     }

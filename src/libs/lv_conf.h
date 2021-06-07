@@ -47,7 +47,7 @@
 /* Dot Per Inch: used to initialize default sizes.
  * E.g. a button with width = LV_DPI / 2 -> half inch wide
  * (Not so important, you can adjust it to modify default sizes and spaces)*/
-#define LV_DPI              300     /*[px]*/
+#define LV_DPI              130     /*[px]*/
 
 /* The the real width of the display changes some default values:
  * default object sizes, layout of examples, etc.
@@ -236,7 +236,7 @@ typedef void * lv_fs_drv_user_data_t;
  * With complex image decoders (e.g. PNG or JPG) caching can save the continuous open/decode of images.
  * However the opened images might consume additional RAM.
  * LV_IMG_CACHE_DEF_SIZE must be >= 1 */
-#define LV_IMG_CACHE_DEF_SIZE       1
+#define LV_IMG_CACHE_DEF_SIZE       2
 
 /*Declare the type of the user data of image decoder (can be e.g. `void *`, `int`, `struct`)*/
 typedef void* lv_img_decoder_user_data_t;
@@ -413,10 +413,10 @@ typedef void* lv_indev_drv_user_data_t;            /*Type of user data in the in
  *                                LV_FONT_DECLARE(my_font_2)
  */
 
-#define LV_FONT_CUSTOM_DECLARE LV_FONT_DECLARE(jetbrains_mono_bold_20) \
-                               LV_FONT_DECLARE(jetbrains_mono_extrabold_compressed) \
-                               LV_FONT_DECLARE(jetbrains_mono_42) \
-                               LV_FONT_DECLARE(jetbrains_mono_76) \
+#define LV_FONT_CUSTOM_DECLARE LV_FONT_DECLARE(San_Francisco_20) \
+                               LV_FONT_DECLARE(San_Francisco_20) \
+                               LV_FONT_DECLARE(San_Francisco_20) \
+                               LV_FONT_DECLARE(San_Francisco_20) \
                                LV_FONT_DECLARE(lv_font_sys_48)
 
 /* Enable it if you have fonts with a lot of characters.
@@ -477,10 +477,10 @@ typedef void* lv_font_user_data_t;
 #define LV_THEME_DEFAULT_COLOR_PRIMARY      lv_color_hex(0xffffff)
 #define LV_THEME_DEFAULT_COLOR_SECONDARY    lv_color_hex(0xaaaaaa)
 #define LV_THEME_DEFAULT_FLAG               0//LV_THEME_MATERIAL_FLAG_DARK
-#define LV_THEME_DEFAULT_FONT_SMALL         &jetbrains_mono_bold_20
-#define LV_THEME_DEFAULT_FONT_NORMAL        &jetbrains_mono_bold_20
-#define LV_THEME_DEFAULT_FONT_SUBTITLE      &jetbrains_mono_bold_20
-#define LV_THEME_DEFAULT_FONT_TITLE         &jetbrains_mono_bold_20
+#define LV_THEME_DEFAULT_FONT_SMALL         &San_Francisco_20
+#define LV_THEME_DEFAULT_FONT_NORMAL        &San_Francisco_20
+#define LV_THEME_DEFAULT_FONT_SUBTITLE      &San_Francisco_20
+#define LV_THEME_DEFAULT_FONT_TITLE         &San_Francisco_20
 
 /*=================
  *  Text settings
@@ -585,7 +585,7 @@ typedef void* lv_obj_user_data_t;
 #define LV_USE_BTNMATRIX     1
 
 /*Calendar (dependencies: -)*/
-#define LV_USE_CALENDAR 1
+#define LV_USE_CALENDAR 0
 #if LV_USE_CALENDAR
 #define LV_CALENDAR_WEEK_STARTS_MONDAY    0
 #endif
@@ -616,7 +616,7 @@ typedef void* lv_obj_user_data_t;
 #endif
 
 /*Gauge (dependencies:lv_bar, lv_linemeter)*/
-#define LV_USE_GAUGE    1
+#define LV_USE_GAUGE    0
 
 /*Image (dependencies: lv_label*/
 #define LV_USE_IMG      1

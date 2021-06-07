@@ -19,6 +19,7 @@
 #include <drivers/Watchdog.h>
 #include "TouchEvents.h"
 #include "Apps.h"
+#include "timers.h"
 
 
 namespace Watch {
@@ -29,7 +30,7 @@ namespace Watch {
     class DisplayApp {
       public:
         enum class States {Idle, Running};
-        enum class Messages : uint8_t {GoToSleep,UpdateBatteryLevel,GoToRunning,TouchEvent, UpdateBleConnection,Charging,ButtonPushed, BleFirmwareUpdateStarted,Impact,Fall,CheckIn,Clock,Lowbattery};
+        enum class Messages : uint8_t {GoToSleep,GoToRunning,TouchEvent, UpdateBleConnection,Charging,ButtonPushed, BleFirmwareUpdateStarted,Impact,Fall,CheckIn,Clock,Lowbattery};
         enum class TouchModes { Gestures, Polling };
          enum class FullRefreshDirections { None, Up, Down, Left, Right, LeftAnim, RightAnim };
 
@@ -44,9 +45,11 @@ namespace Watch {
         void StartApp(uint8_t app, DisplayApp::FullRefreshDirections direction);
         void SetTouchMode(TouchModes mode);
         void SetFullRefresh(FullRefreshDirections direction);
+        void TouchPolling();
 
      private:
         TaskHandle_t taskHandle;
+        TimerHandle_t idleTimerTouch;
 
         Watch::Drivers::St7789& lcd;
         Watch::Components::LittleVgl& lvgl;   
@@ -65,7 +68,7 @@ namespace Watch {
         Apps returnToApp = Apps::None;
         FullRefreshDirections returnDirection = FullRefreshDirections::None;
         TouchEvents returnTouchEvent = TouchEvents::None;
-        TouchModes touchMode = TouchModes::Gestures;
+        TouchModes touchMode = TouchModes::Polling;
         States state = States::Running;
         QueueHandle_t msgQueue;
         static constexpr uint8_t queueSize = 10;

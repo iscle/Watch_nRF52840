@@ -77,14 +77,14 @@ Watch::Drivers::Cst816S touchPanel {twiMaster, touchPanelTwiAddress};
 Watch::Components::LittleVgl lvgl {lcd, touchPanel};
 
 TimerHandle_t debounceTimer;
-TimerHandle_t debounceChargeTimer;
+//TimerHandle_t debounceChargeTimer;
 Watch::Controllers::Battery batteryController;
 Watch::Controllers::Ble bleController;
 Watch::Controllers::DateTime dateTimeController;
 void ble_manager_set_ble_connection_callback(void (*connection)());
 void ble_manager_set_ble_disconnection_callback(void (*disconnection)());
 static constexpr uint8_t pinTouchIrq = 25;
-static constexpr uint8_t pinPowerPresentIrq = 20;
+//static constexpr uint8_t pinPowerPresentIrq = 20;
 std::unique_ptr<Watch::System::SystemTask> systemTask;
 
 Watch::Controllers::NotificationManager notificationManager;
@@ -97,22 +97,23 @@ void nrfx_gpiote_evt_handler(nrfx_gpiote_pin_t pin, nrf_gpiote_polarity_t action
   }
 
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-
+/*
   if (pin == pinPowerPresentIrq and action == NRF_GPIOTE_POLARITY_TOGGLE) {
     xTimerStartFromISR(debounceChargeTimer, &xHigherPriorityTaskWoken);
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
     return;
   }
-
+*/
   xTimerStartFromISR(debounceTimer, &xHigherPriorityTaskWoken);
   portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
+/*
 void DebounceTimerChargeCallback(TimerHandle_t xTimer) {
   xTimerStop(xTimer, 0);
   systemTask->PushMessage(Watch::System::SystemTask::Messages::OnChargingEvent);
 }
-
+*/
 
 void Time_IRQHandler(void * p_context){
  systemTask->ResetSensor(); 
@@ -250,7 +251,7 @@ void nimble_port_ll_task_func(void *args) {
 int main(void) { 
   nrf_drv_clock_init();
   debounceTimer = xTimerCreate ("debounceTimer", 200, pdFALSE, (void *) 0, DebounceTimerCallback);
-  debounceChargeTimer = xTimerCreate("debounceTimerCharge", 200, pdFALSE, (void*) 0, DebounceTimerChargeCallback);
+  //debounceChargeTimer = xTimerCreate("debounceTimerCharge", 200, pdFALSE, (void*) 0, DebounceTimerChargeCallback);
 
   systemTask.reset(new Watch::System::SystemTask(spi, lcd, spiNorFlash, twiMaster, touchPanel, motionSensor,
           lvgl, batteryController, bleController,dateTimeController, notificationManager,acnt101));

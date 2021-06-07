@@ -14,18 +14,18 @@ Battery::Battery() {
 void Battery::Init() {
   nrf_gpio_cfg_input(chargingPin, (nrf_gpio_pin_pull_t)GPIO_PIN_CNF_PULL_Pullup);
   //nrf_gpio_cfg_input(powerPresentPin, (nrf_gpio_pin_pull_t)GPIO_PIN_CNF_PULL_Pullup);
-  MotorControllerInit();
+  //MotorControllerInit();
 }
 
-void Battery::Update() {  
+void Battery::Update() { 
+  isCharging = !nrf_gpio_pin_read(chargingPin);
+ // isPowerPresent = !nrf_gpio_pin_read(powerPresentPin);  
   if ( isReading ) return;
   // Non blocking read
   samples = 0;
   isReading = true;
-  SaadcInit();	
-
-	nrfx_saadc_sample();
-  
+  SaadcInit();
+	nrfx_saadc_sample();  
 }
 
 void Battery::adcCallbackStatic(nrfx_saadc_evt_t const *event) {
@@ -64,16 +64,17 @@ void Battery::SaadcEventHandler(nrfx_saadc_evt_t const * p_event) {
       voltage = (static_cast<float>(p_event->data.done.p_buffer[0]) * 2.04f) / (1024 / 3.0f);
       voltage = roundf(voltage * 100.0f) / 100.0f;
 
-      percentRemaining = static_cast<int>(((voltage - battery_min) / (battery_max - battery_min)) * 100.0f);
+      percentRemainingRead = static_cast<int>(((voltage - battery_min) / (battery_max - battery_min)) * 100.0f);
 
-      percentRemaining = std::max(percentRemaining, 0.0f);
-      percentRemaining = std::min(percentRemaining, 100.0f);
+      percentRemainingRead = std::max(percentRemainingRead, 0.0f);
+      percentRemainingRead = std::min(percentRemainingRead, 100.0f);
 
-      percentRemainingBuffer.insert(percentRemaining);
+      percentRemainingBuffer.insert(percentRemainingRead);
       samples++;
       if ( samples > percentRemainingSamples ) {
         nrfx_saadc_uninit();
         isReading = false;
+        percentRemaining=percentRemainingBuffer.GetAverage();
       } else {
         nrfx_saadc_sample();
       }
@@ -95,7 +96,6 @@ void Battery::setButtonDataNoVibrate( uint8_t data) {
 void Battery::setIsTouch( bool data) {  isTouch = data;}  
 void Battery::setIsVibrate(void){ MotorControllerSetDuration(200);} 
 void Battery::StopVibrate(void) {MotorControllerStop();}
-bool Battery::IsCharging(){ return !nrf_gpio_pin_read(chargingPin);}
 
 void Battery::impactCharacteristic(uint8_t zz, uint8_t yy){
   impactyy=yy;
@@ -196,15 +196,15 @@ void Battery::setcheckVibrate(bool data){checkVibrate=data;}
 void Battery::setisButtonPushed(bool data){isButtonPushed=data;}
 void Battery::setDisturnOff(bool data){isDisturnOff=data;};
 
-void Battery::setxyz( int8_t _x,int8_t _y,int8_t _z) {
+void Battery::setxyz( float _x,float _y,float _z) {
 x=_x;
 y=_y;
 z=_z;
 }
 
-void Battery::setXmax(int8_t x){xmax=x;};
-void Battery::setYmax(int8_t y){ymax=y;};
-void Battery::setZmax(int8_t z){zmax=z;};
+void Battery::setXmax(float x){xmax=x;};
+void Battery::setYmax(float y){ymax=y;};
+void Battery::setZmax(float z){zmax=z;};
 
 
 

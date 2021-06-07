@@ -33,8 +33,15 @@ DisplayApp::DisplayApp(Drivers::St7789 &lcd, Components::LittleVgl &lvgl, Driver
           msgQueue = xQueueCreate(queueSize, itemSize);
           onClockApp = true;         
         }
-
+/*
+void IdleTimerTouchCallback(TimerHandle_t xTimer) {
+  auto disTask = static_cast<DisplayApp *>(pvTimerGetTimerID(xTimer));
+  disTask->TouchPolling();
+}
+*/
 void DisplayApp::Start() {
+ // idleTimerTouch = xTimerCreate ("idleTimer", pdMS_TO_TICKS(400), pdTRUE, this, IdleTimerTouchCallback);
+  //xTimerStart(idleTimerTouch, 0);
   if (pdPASS != xTaskCreate(DisplayApp::Process, "displayapp", 800, this, 0, &taskHandle)) {
     APP_ERROR_HANDLER(NRF_ERROR_NO_MEM);
   }
@@ -52,7 +59,6 @@ void DisplayApp::Process(void* instance) {
 
 void DisplayApp::InitHw() {
 }
-
 
 void DisplayApp::Refresh() {
   TickType_t queueTimeout;
@@ -88,9 +94,6 @@ void DisplayApp::Refresh() {
         if(bleController.IsConnected()) { SwitchApp(1);   appIndex =1; }          
         else SwitchApp(7);           
         break;
-      case Messages::UpdateBatteryLevel:
-        batteryController.Update();
-      break;
       case Messages::TouchEvent: {
         if (state != States::Running) break;        
         auto gesture = OnTouchEvent();
@@ -150,7 +153,7 @@ void DisplayApp::Refresh() {
           break;
 
       case Messages::Impact:
-         // batteryController.setDisturnOff(true);
+          batteryController.setDisturnOff(true);
           checkImpact= true;
           batteryController.setButtonData(0x12); 
           batteryController.setIsAlert(0x12); 
@@ -196,8 +199,12 @@ void DisplayApp::Refresh() {
           break;
     }
   }
- 
-  if(state != States::Idle && touchMode == TouchModes::Polling) {
+  TouchPolling();
+}
+
+
+void DisplayApp::TouchPolling(){
+    if(state != States::Idle && touchMode == TouchModes::Polling) {
     auto info = touchPanel.GetTouchInfo();
     if(info.action == 2) {// 2 = contact
       if(!currentScreen->OnTouchEvent(info.x, info.y)) {
@@ -206,6 +213,7 @@ void DisplayApp::Refresh() {
     }
   } 
 }
+
 
 void DisplayApp::RunningState() {
   if (!currentScreen->Refresh()) {

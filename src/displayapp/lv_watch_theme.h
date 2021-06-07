@@ -26,6 +26,7 @@ extern "C" {
 #define LV_WATCH_BLUE       lv_color_hex(0x2f3243) // 006fb6
 #define LV_WATCH_GREEN      lv_color_hex(0x4cb242)
 #define LV_WATCH_RED        lv_color_hex(0xd51732)
+#define LV_CHARGING_GRAY    lv_color_hex(0x302E2C)
 
 /**********************
  *      TYPEDEFS

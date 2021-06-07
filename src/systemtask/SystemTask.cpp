@@ -16,6 +16,7 @@
 #include "SEGGER_RTT.h" 
 
 using namespace Watch::System;
+using namespace std;
 
 void IdleTimerCallback(TimerHandle_t xTimer) {
   auto sysTask = static_cast<SystemTask *>(pvTimerGetTimerID(xTimer));
@@ -96,8 +97,6 @@ void SystemTask::Work() {
                                                           dateTimeController, watchdogView, *this,tempSensor);
   displayApp->Start();
 
-  displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::UpdateBatteryLevel);
-
   nrf_gpio_cfg_sense_input(pinButton, (nrf_gpio_pin_pull_t)GPIO_PIN_CNF_PULL_Pullup, (nrf_gpio_pin_sense_t)GPIO_PIN_CNF_SENSE_Low); 
   nrfx_gpiote_in_config_t pinConfig;
   pinConfig.skip_gpio_setup = true;
@@ -122,7 +121,7 @@ void SystemTask::Work() {
      
   idleTimer = xTimerCreate ("idleTimer", pdMS_TO_TICKS(25000), pdFALSE, this, IdleTimerCallback);
   idleTimerAcc = xTimerCreate ("idleTimerAcc", pdMS_TO_TICKS(50), pdTRUE, this, IdleTimerAccCallback);
-  idleTimerCommon = xTimerCreate ("idleTimerCommon", pdMS_TO_TICKS(200), pdTRUE, this, IdleTimerCommonCallback);
+  idleTimerCommon = xTimerCreate ("idleTimerCommon", pdMS_TO_TICKS(500), pdTRUE, this, IdleTimerCommonCallback);
   idleTimerTracking = xTimerCreate ("idleTimerAcc", pdMS_TO_TICKS(60000), pdTRUE, this, IdleTimerTrackingCallback);
   idleTimerHeartbeat = xTimerCreate ("idleTimerHeartbeat", pdMS_TO_TICKS(60000), pdTRUE, this, IdleTimerHeartbeatCallback);
   xTimerStart(idleTimer, 0);
@@ -146,7 +145,6 @@ void SystemTask::Work() {
           //touchPanel.Wakeup();
           lcd.Wakeup();                
           displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::GoToRunning);
-          displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::UpdateBatteryLevel);
           isSleeping = false;
           isWakingUp = false;      
           break;
@@ -218,21 +216,6 @@ void SystemTask::Work() {
         default: break;
       }
     }
-
-    if(batteryController.Istracking()){  
-      if (batteryController.getIsAlert()!=preAlert) { 
-        xTimerStart(idleTimerTracking, 0);
-        checktime=0;
-        checknum=0;
-      }
-      preAlert= batteryController.getIsAlert();
-    }
-
-    if(batteryController.Isheartbeat()&& checkheartbeat) { xTimerStart(idleTimerHeartbeat, 0); checkheartbeat = false;}
-
-    if(batteryController.getGoToSleep())  doNotGoToSleep = false;  else doNotGoToSleep = true;  
-
-    CheckLowbattery();  
 
     uint32_t systick_counter = nrf_rtc_counter_get(portNRF_RTC_REG);
     dateTimeController.UpdateTime(systick_counter);
@@ -311,22 +294,21 @@ void SystemTask::ReadTempSensor() {
 
 void SystemTask::CheckFallImpact(){
 if(bleController.IsConnected()) {
+   auto xyz=motionSensor.Process();
     //Test//
- /* if((batteryController.getfallyy()!=0x02)||(batteryController.getimpactyy()!=0x02)){
-    batteryController.setAccData(motionSensor.Process());
-    auto xyz =motionSensor.ProcessTest();
+  if((batteryController.getfallyy()!=0x02)||(batteryController.getimpactyy()!=0x02)){
+    batteryController.setAccData(xyz.acc);
     batteryController.setxyz(xyz.x,xyz.y,xyz.z);
     batteryController.setXmax(std::max(abs(xyz.x),abs(batteryController.getxmax())));
     batteryController.setYmax(std::max(abs(xyz.y),abs(batteryController.getymax())));
     batteryController.setZmax(std::max(abs(xyz.z),abs(batteryController.getzmax())));
   }
-  */
-
+  
     if(batteryController.getfallyy()!=0x02) {
-        if(accValue>batteryController.getfallHighpeak()) isFallDiscoveryTimerRunning =true;
+        if(xyz.acc>batteryController.getfallHighpeak()) isFallDiscoveryTimerRunning =true;
         if(isFallDiscoveryTimerRunning) FallDiscoveryTimer++;
 
-        if(((FallDiscoveryTimer==batteryController.getfalltime()*20)&&(accValue<batteryController.getfallLowpeak()))||(batteryController.getfallyy()==0x07)){
+        if(((FallDiscoveryTimer==batteryController.getfalltime()*20)&&(xyz.acc<batteryController.getfallLowpeak()))||(batteryController.getfallyy()==0x07)){
           if(isSleeping && !isWakingUp) GoToRunning();
           displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::Fall);
           batteryController.setfallyy(0x01);
@@ -337,7 +319,7 @@ if(bleController.IsConnected()) {
     }
  
   if((batteryController.getimpactyy()!=0x02) && (!isFallDiscoveryTimerRunning)) {
-      if(accValue>batteryController.getimpactzz()) isImpactDiscoveryTimerRunning =true;
+      if(xyz.acc>batteryController.getimpactzz()) isImpactDiscoveryTimerRunning =true;
       if(isImpactDiscoveryTimerRunning || (batteryController.getimpactyy()==0x05)){
         if(isSleeping && !isWakingUp) GoToRunning();
         displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::Impact);
@@ -350,8 +332,6 @@ if(bleController.IsConnected()) {
 
 
 void SystemTask::CheckACC() { 
-  accValue=motionSensor.Process();
-  batteryController.setAccData(accValue);
   nimbleController.ble_acc_checkevent();
   CheckFallImpact();
 }
@@ -361,7 +341,20 @@ void SystemTask::CheckCommon(){
   
     nimbleController.ble_checkevent();
     CheckCheckIn();
-    //CheckFallImpact();
+
+    if(batteryController.Isheartbeat()&& checkheartbeat) { xTimerStart(idleTimerHeartbeat, 0); checkheartbeat = false;}
+    if(batteryController.getGoToSleep())  doNotGoToSleep = false;  else doNotGoToSleep = true; 
+
+    if(batteryController.Istracking()){  
+      if (batteryController.getIsAlert()!=preAlert) { 
+        xTimerStart(idleTimerTracking, 0);
+        checktime=0;
+        checknum=0;
+      }
+      preAlert= batteryController.getIsAlert();
+    }
+
+    CheckLowbattery();  
 
 	  if(!checkcharging && batteryController.IsCharging()){ 
        if(isSleeping && !isWakingUp) GoToRunning();
@@ -371,6 +364,7 @@ void SystemTask::CheckCommon(){
         displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::Charging);
     } 
     checkcharging=batteryController.IsCharging();
+    batteryController.Update();
 }
 
 
@@ -408,8 +402,9 @@ void SystemTask::CheckLowbattery(){
         displayApp->PushMessage(Watch::Applications::DisplayApp::Messages::Lowbattery);
         checklowbattery = true;
     } 
-    if((batteryController.PercentRemaining()>30)&& batteryController.IsCharging()) checklowbattery = false;
+    if((batteryController.PercentRemaining()>30) || batteryController.IsCharging()) checklowbattery = false;
 }
+
 
 void SystemTask::CheckCheckIn(){
     uint8_t hour = dateTimeController.Hours();

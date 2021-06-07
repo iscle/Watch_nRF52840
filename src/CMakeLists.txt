@@ -406,8 +406,8 @@ list(APPEND IMAGE_FILES
         displayapp/icons/clock/Impact.c   
         displayapp/icons/clock/close.c  
         displayapp/icons/clock/Fall.c
-        displayapp/icons/clock/arrowleft.c 
-        displayapp/icons/clock/arrowright.c 
+        #displayapp/icons/clock/arrowleft.c 
+        #isplayapp/icons/clock/arrowright.c 
         displayapp/icons/clock/pointclock.c
         displayapp/icons/clock/pointtest.c
         displayapp/icons/clock/pointsensor.c
@@ -519,7 +519,7 @@ list(APPEND SOURCE_FILES
 
         displayapp/LittleVgl.cpp
         #displayapp/fonts/jetbrains_mono_extrabold_compressed.c
-        displayapp/fonts/jetbrains_mono_bold_20.c
+        #displayapp/fonts/jetbrains_mono_bold_20.c
         displayapp/fonts/San_Francisco_20.c
         displayapp/fonts/San_Francisco_50.c
         displayapp/fonts/San_Francisco_22.c
@@ -614,16 +614,16 @@ list(APPEND GRAPHICS_SOURCE_FILES
 
         components/battery/BatteryController.h
         components/ble/BleController.h
-        components/ble/NotificationManager.h
+        #components/ble/NotificationManager.h
         components/datetime/DateTimeController.h
         components/ble/NimbleController.h
         components/ble/DeviceInformationService.h
         components/ble/CurrentTimeClient.h
-        components/ble/AlertNotificationClient.h
+        #components/ble/AlertNotificationClient.h
         components/ble/DfuService.h
         components/firmwarevalidator/FirmwareValidator.h
         components/ble/BatteryInformationService.h
-        components/ble/ImmediateAlertService.h
+        #components/ble/ImmediateAlertService.h
         components/ble/ServiceDiscovery.h
         components/ble/BleClient.h
         components/ble/Keyfob.h

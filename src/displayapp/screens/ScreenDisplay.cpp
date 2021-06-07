@@ -189,7 +189,8 @@ ScreenDisplay::ScreenDisplay(DisplayApp* app,
 
           buttonBig =  lv_icon_create(lv_scr_act(), &helpButton);      
           lv_obj_align(buttonBig, NULL, LV_ALIGN_CENTER, 0,30);
-        
+          
+          /*
           lableleftCircle =lv_img_create(lv_scr_act(), NULL);
           lv_img_set_src(lableleftCircle, &leftCircle);
           lv_obj_align(lableleftCircle, lv_scr_act(), LV_ALIGN_CENTER, -58, 34); 
@@ -201,11 +202,12 @@ ScreenDisplay::ScreenDisplay(DisplayApp* app,
           lablerightCircle =lv_img_create(lv_scr_act(), NULL);
           lv_img_set_src(lablerightCircle, &rightCircle);
           lv_obj_align(lablerightCircle, lv_scr_act(), LV_ALIGN_CENTER, 57, 34); 
-
+          
           lv_obj_set_hidden(lableleftCircle,true);
           lv_obj_set_hidden(labletopCircle,true);
           lv_obj_set_hidden(lablerightCircle,true);
-
+          */
+          
           buttonSmall =  lv_icon_create(lv_scr_act(), &Okbutton);  
           lv_obj_align(buttonSmall, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 27); // PHAI LEN
           /*
@@ -234,7 +236,7 @@ ScreenDisplay::ScreenDisplay(DisplayApp* app,
           batteryController.setGoToSleep(true);
           buttonBig =  lv_icon_create(lv_scr_act(), &TestButton);  
           lv_obj_align(buttonBig, NULL, LV_ALIGN_CENTER, 0,30);
-          
+          /*
           lableleftCircle =lv_img_create(lv_scr_act(), NULL);
           lv_img_set_src(lableleftCircle, &leftCircle);
           lv_obj_align(lableleftCircle, lv_scr_act(), LV_ALIGN_CENTER, -58, 34); 
@@ -250,7 +252,7 @@ ScreenDisplay::ScreenDisplay(DisplayApp* app,
           lv_obj_set_hidden(lableleftCircle,true);
           lv_obj_set_hidden(labletopCircle,true);
           lv_obj_set_hidden(lablerightCircle,true);
-
+          */
           labelpoint  = lv_img_create(lv_scr_act(), NULL);
           lv_img_set_src(labelpoint, &pointtest);
           lv_obj_align(labelpoint, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0); 
@@ -262,7 +264,7 @@ ScreenDisplay::ScreenDisplay(DisplayApp* app,
           buttonBig =  lv_icon_create(lv_scr_act(), &Checkin);  
           lv_obj_align(buttonBig, NULL, LV_ALIGN_CENTER, 0,30);
            batteryController.setisButtonPushed(false);
-
+          /*
           lableleftCircle =lv_img_create(lv_scr_act(), NULL);
           lv_img_set_src(lableleftCircle, &leftCircle);
           lv_obj_align(lableleftCircle, lv_scr_act(), LV_ALIGN_CENTER, -58, 34); 
@@ -278,7 +280,7 @@ ScreenDisplay::ScreenDisplay(DisplayApp* app,
           lv_obj_set_hidden(lableleftCircle,true);
           lv_obj_set_hidden(labletopCircle,true);
           lv_obj_set_hidden(lablerightCircle,true);
-
+          */
           buttonSmall =  lv_icon_create(lv_scr_act(), &close);  
           lv_obj_align(buttonSmall, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 27); 
 
@@ -288,7 +290,7 @@ ScreenDisplay::ScreenDisplay(DisplayApp* app,
           timeoutCountStart = xTaskGetTickCount();
           batteryController.setisButtonPushed(false); 
           lv_obj_align(buttonBig, NULL, LV_ALIGN_CENTER, 0,30);
-
+          /*
           lableleftCircle =lv_img_create(lv_scr_act(), NULL);
           lv_img_set_src(lableleftCircle, &leftCircle);
           lv_obj_align(lableleftCircle, lv_scr_act(), LV_ALIGN_CENTER, -58, 34); 
@@ -304,41 +306,40 @@ ScreenDisplay::ScreenDisplay(DisplayApp* app,
           lv_obj_set_hidden(lableleftCircle,true);
           lv_obj_set_hidden(labletopCircle,true);
           lv_obj_set_hidden(lablerightCircle,true);
-
+          */
           buttonSmall =  lv_icon_create(lv_scr_act(), &Okbutton);  
           lv_obj_align(buttonSmall, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 27);
-          /*
+          
           x = lv_label_create(lv_scr_act(), NULL);
-          lv_label_set_style(x, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_obj_set_style_local_text_font(x, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &San_Francisco_22);
           lv_label_set_text(x, "0"); 
           lv_obj_align(x, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0, 30); 
           y = lv_label_create(lv_scr_act(), NULL);
-          lv_label_set_style(y, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_obj_set_style_local_text_font(y, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &San_Francisco_22);
           lv_label_set_text(y, "0"); 
           lv_obj_align(y, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0, 60); 
           z = lv_label_create(lv_scr_act(), NULL);
-          lv_label_set_style(z, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_obj_set_style_local_text_font(z, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &San_Francisco_22);
           lv_label_set_text(z, "0"); 
           lv_obj_align(z, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0, 90); 
 
           Xmax = lv_label_create(lv_scr_act(), NULL);
-          lv_label_set_style(Xmax, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_obj_set_style_local_text_font(Xmax, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &San_Francisco_22);
           lv_label_set_text(Xmax, "0"); 
           lv_obj_align(Xmax, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0, 140); 
           Ymax = lv_label_create(lv_scr_act(), NULL);
-          lv_label_set_style(Ymax, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_obj_set_style_local_text_font(Ymax, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &San_Francisco_22);
           lv_label_set_text(Ymax, "0"); 
           lv_obj_align(Ymax, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0,170 ); 
           Zmax = lv_label_create(lv_scr_act(), NULL);
-          lv_label_set_style(Zmax, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_obj_set_style_local_text_font(Zmax, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &San_Francisco_22);
           lv_label_set_text(Zmax, "0"); 
           lv_obj_align(Zmax, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0, 200); 
 
           gwatch = lv_label_create(lv_scr_act(), NULL);
-          lv_label_set_style(gwatch, LV_LABEL_STYLE_MAIN, LabelSanStyle);
+          lv_obj_set_style_local_text_font(gwatch, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &San_Francisco_22);
           lv_label_set_text(gwatch, "0"); 
           lv_obj_align(gwatch, lv_scr_act(), LV_ALIGN_IN_RIGHT_MID, -45, 0);
-          */
           //app->SetTouchMode(DisplayApp::TouchModes::Polling); 
 
           break;
@@ -347,7 +348,7 @@ ScreenDisplay::ScreenDisplay(DisplayApp* app,
           timeoutCountStart = xTaskGetTickCount();
           batteryController.setisButtonPushed(false); 
           lv_obj_align(buttonBig, NULL, LV_ALIGN_CENTER, 0,30);
-
+          /*
           lableleftCircle =lv_img_create(lv_scr_act(), NULL);
           lv_img_set_src(lableleftCircle, &leftCircle);
           lv_obj_align(lableleftCircle, lv_scr_act(), LV_ALIGN_CENTER, -58, 34); 
@@ -363,7 +364,7 @@ ScreenDisplay::ScreenDisplay(DisplayApp* app,
           lv_obj_set_hidden(lableleftCircle,true);
           lv_obj_set_hidden(labletopCircle,true);
           lv_obj_set_hidden(lablerightCircle,true);
-
+            */
           buttonSmall =  lv_icon_create(lv_scr_act(), &Okbutton);  
           lv_obj_align(buttonSmall, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 27);
           
@@ -441,17 +442,36 @@ ScreenDisplay::ScreenDisplay(DisplayApp* app,
           lv_obj_align(imgpair, nullptr, LV_ALIGN_CENTER, 0, 10);  
           break;
         case Modes::Charging:
-          batteryController.setGoToSleep(true);   
-          
-          imgpair = lv_img_create(lv_scr_act(), nullptr);  
-          lv_img_set_src(imgpair, &charging);
-          lv_obj_align(imgpair, nullptr, LV_ALIGN_CENTER, 0, 10); 
-          timeoutCountStart = xTaskGetTickCount();
-
+         batteryController.setGoToSleep(true);  
+          arc = lv_arc_create(lv_scr_act(), NULL);  
+          // make a circle gray color
+          lv_arc_set_bg_start_angle(arc, 0);
+          lv_arc_set_bg_end_angle(arc, 360);           
+          lv_arc_set_rotation(arc, 270); // rotate origin
+          lv_arc_set_start_angle(arc, 0);
+          lv_obj_set_size(arc, 160, 160);
+          lv_obj_align(arc, NULL, LV_ALIGN_CENTER, 0, 10);
+          timeoutCountStart = xTaskGetTickCount(); 
+          /* Make label */
           tempCValue = lv_label_create(lv_scr_act(), nullptr);
           lv_label_set_text(tempCValue, ""); 
-          lv_obj_set_style_local_text_font(tempCValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &San_Francisco_22); 
-          lv_obj_align( tempCValue,lv_scr_act(), LV_ALIGN_CENTER, -25, 40);
+          lv_obj_set_style_local_text_font(tempCValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &San_Francisco_30); 
+          lv_obj_align( tempCValue,lv_scr_act(), LV_ALIGN_CENTER, -35, 40);
+
+          lablepercent = lv_label_create(lv_scr_act(), nullptr);
+          lv_label_set_text(lablepercent, "%");
+          lv_obj_set_style_local_text_font(lablepercent, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &San_Francisco_30);  
+          lv_obj_align(lablepercent, lv_scr_act(), LV_ALIGN_CENTER, 25, 40); 
+
+          tempWire = lv_label_create(lv_scr_act(), nullptr);
+          lv_label_set_text(tempWire, "Wireless"); 
+          lv_obj_set_style_local_text_font(tempWire, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &San_Francisco_22); 
+          lv_obj_align( tempWire,lv_scr_act(), LV_ALIGN_CENTER, -2, -17);
+
+          tempChar = lv_label_create(lv_scr_act(), nullptr);
+          lv_label_set_text(tempChar, "Charging"); 
+          lv_obj_set_style_local_text_font(tempChar, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &San_Francisco_22); 
+          lv_obj_align( tempChar,lv_scr_act(), LV_ALIGN_CENTER, -2, 5);
 
           break;
         case Modes::LowBattery:         
@@ -614,14 +634,14 @@ bool ScreenDisplay::Refresh() {
     lv_label_set_text(label_time, timeStr); 
   if((xTaskGetTickCount()-timeoutCountStart) < 1.5*1024) {checkTouchBigButton = false;}
     if(checkTouchBigButton) {
-          lv_obj_set_hidden(lableleftCircle,false);
-          lv_obj_set_hidden(labletopCircle,false);
-          lv_obj_set_hidden(lablerightCircle,false);
+         // lv_obj_set_hidden(lableleftCircle,false);
+         // lv_obj_set_hidden(labletopCircle,false);
+         // lv_obj_set_hidden(lablerightCircle,false);
 
     } else {
-          lv_obj_set_hidden(lableleftCircle,true);
-          lv_obj_set_hidden(labletopCircle,true);
-          lv_obj_set_hidden(lablerightCircle,true);
+         // lv_obj_set_hidden(lableleftCircle,true);
+         // lv_obj_set_hidden(labletopCircle,true);
+         // lv_obj_set_hidden(lablerightCircle,true);
     }
     checkTouchBigButton = false;
     break;
@@ -634,14 +654,14 @@ bool ScreenDisplay::Refresh() {
     }
     if((xTaskGetTickCount()-timeoutCountStartL) < 1.5*1024) {checkTouchBigButton = false;}
     if(checkTouchBigButton) {
-          lv_obj_set_hidden(lableleftCircle,false);
-          lv_obj_set_hidden(labletopCircle,false);
-          lv_obj_set_hidden(lablerightCircle,false);
+          //lv_obj_set_hidden(lableleftCircle,false);
+          //lv_obj_set_hidden(labletopCircle,false);
+          //lv_obj_set_hidden(lablerightCircle,false);
 
     } else {
-          lv_obj_set_hidden(lableleftCircle,true);
-          lv_obj_set_hidden(labletopCircle,true);
-          lv_obj_set_hidden(lablerightCircle,true);
+          //lv_obj_set_hidden(lableleftCircle,true);
+          //lv_obj_set_hidden(labletopCircle,true);
+          //lv_obj_set_hidden(lablerightCircle,true);
     }
     checkTouchBigButton = false;
 
@@ -650,14 +670,14 @@ bool ScreenDisplay::Refresh() {
 
     if((xTaskGetTickCount()-timeoutCountStartL) < 1.5*1024) {checkTouchBigButton = false;}
     if(checkTouchBigButton) {
-          lv_obj_set_hidden(lableleftCircle,false);
-          lv_obj_set_hidden(labletopCircle,false);
-          lv_obj_set_hidden(lablerightCircle,false);
+          //lv_obj_set_hidden(lableleftCircle,false);
+          //lv_obj_set_hidden(labletopCircle,false);
+          //lv_obj_set_hidden(lablerightCircle,false);
 
     } else {
-          lv_obj_set_hidden(lableleftCircle,true);
-          lv_obj_set_hidden(labletopCircle,true);
-          lv_obj_set_hidden(lablerightCircle,true);
+          //lv_obj_set_hidden(lableleftCircle,true);
+         // lv_obj_set_hidden(labletopCircle,true);
+         // lv_obj_set_hidden(lablerightCircle,true);
     }
     checkTouchBigButton = false;
 
@@ -704,29 +724,29 @@ bool ScreenDisplay::Refresh() {
 
       if((xTaskGetTickCount()-timeoutCountStartL) < 1.5*1024) {checkTouchBigButton = false;}
     if(checkTouchBigButton) {
-          lv_obj_set_hidden(lableleftCircle,false);
-          lv_obj_set_hidden(labletopCircle,false);
-          lv_obj_set_hidden(lablerightCircle,false);
+         // lv_obj_set_hidden(lableleftCircle,false);
+         // lv_obj_set_hidden(labletopCircle,false);
+         // lv_obj_set_hidden(lablerightCircle,false);
 
     } else {
-          lv_obj_set_hidden(lableleftCircle,true);
-          lv_obj_set_hidden(labletopCircle,true);
-          lv_obj_set_hidden(lablerightCircle,true);
+         // lv_obj_set_hidden(lableleftCircle,true);
+         // lv_obj_set_hidden(labletopCircle,true);
+         // lv_obj_set_hidden(lablerightCircle,true);
     }
     checkTouchBigButton = false;
-/*    char strx[6];
+    char strx[6];
     char stry[6];
     char strz[6];
     char strxmax[6];
     char strymax[6];
     char strzmax[6];
     char strg[6];
-    sprintf(strx, "x:%d", batteryController.getx());
-    sprintf(stry, "y:%d", batteryController.gety());
-    sprintf(strz, "z:%d", batteryController.getz());
-    sprintf(strxmax, "xm:%d", batteryController.getxmax());
-    sprintf(strymax, "ym:%d", batteryController.getymax());
-    sprintf(strzmax, "zm:%d", batteryController.getzmax());
+    sprintf(strx, "x:%d", uint8_t(batteryController.getx()*10));
+    sprintf(stry, "y:%d", uint8_t(batteryController.gety()*10));
+    sprintf(strz, "z:%d", uint8_t(batteryController.getz()*10));
+    sprintf(strxmax, "xm:%d", uint8_t(abs(batteryController.getxmax())*10));
+    sprintf(strymax, "ym:%d", uint8_t(batteryController.getymax()*10));
+    sprintf(strzmax, "zm:%d", uint8_t(batteryController.getzmax()*10));
     sprintf(strg, "gw:%d", uint8_t(batteryController.getAccData()*10));
 
     lv_label_set_text(x,strx); 
@@ -736,7 +756,6 @@ bool ScreenDisplay::Refresh() {
     lv_label_set_text(Ymax,strymax); 
     lv_label_set_text(Zmax,strzmax); 
     lv_label_set_text(gwatch,strg); 
-*/
 
     break; 
     case Modes::Fall:
@@ -750,14 +769,14 @@ bool ScreenDisplay::Refresh() {
 
     if((xTaskGetTickCount()-timeoutCountStartL) < 1.5*1024) {checkTouchBigButton = false;}
     if(checkTouchBigButton) {
-          lv_obj_set_hidden(lableleftCircle,false);
-          lv_obj_set_hidden(labletopCircle,false);
-          lv_obj_set_hidden(lablerightCircle,false);
+         // lv_obj_set_hidden(lableleftCircle,false);
+         // lv_obj_set_hidden(labletopCircle,false);
+         // lv_obj_set_hidden(lablerightCircle,false);
 
     } else {
-          lv_obj_set_hidden(lableleftCircle,true);
-          lv_obj_set_hidden(labletopCircle,true);
-          lv_obj_set_hidden(lablerightCircle,true);
+         // lv_obj_set_hidden(lableleftCircle,true);
+         // lv_obj_set_hidden(labletopCircle,true);
+         // lv_obj_set_hidden(lablerightCircle,true);
     }
     checkTouchBigButton = false;
 /*
@@ -809,6 +828,9 @@ bool ScreenDisplay::Refresh() {
         if(flag>30){
           flag =31;      
           lv_label_set_text(tempCValue, strBat);
+          /* end angle in circle white color */     
+          lv_arc_set_end_angle(arc, uint16_t((batteryPercent*3.6)));
+       
         } else flag++;     
         if(timeout>6*1024){ if(bleController.IsConnected()) app->SwitchApp(0); else  app->SwitchApp(7);}
         break;
@@ -1031,15 +1053,15 @@ void ScreenDisplay::buttonEven(lv_obj_t *obj, Modes mode){
               batteryController.setButtonData(0x02);         
               batteryController.setcheckVibrate(false); 
               batteryController.setisButtonPushed(true);
-              batteryController.setGoToSleep(true); 
-              //batteryController.setXmax(0);
-              //batteryController.setYmax(0);
-              //batteryController.setZmax(0);     
+              //batteryController.setGoToSleep(true); 
+              batteryController.setXmax(0);
+              batteryController.setYmax(0);
+              batteryController.setZmax(0);     
           } else if(obj == buttonBig) {
               batteryController.setButtonData(0x13);     
               batteryController.setcheckVibrate(false);
               batteryController.setisButtonPushed(true); 
-              batteryController.setGoToSleep(true);
+              //batteryController.setGoToSleep(true);
           }
           break;
     case Modes::Fall:

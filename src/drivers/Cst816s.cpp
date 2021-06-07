@@ -33,8 +33,8 @@ void Cst816S::Init() {
   */
   static constexpr uint8_t motionMask = 0b00000001;
   twiMaster.Write(twiAddress, 0xEC, &motionMask, 1);
- // static constexpr uint8_t irqCtl = 0b00100000;
- // twiMaster.Write(twiAddress, 0xFA, &irqCtl, 1);
+  //static constexpr uint8_t irqCtl = 0b01000000;
+  //twiMaster.Write(twiAddress, 0xFA, &irqCtl, 1);
  //  static constexpr uint8_t LongPressTime = 5;
  //twiMaster.Write(twiAddress, 0xFC, &LongPressTime, 1);
 

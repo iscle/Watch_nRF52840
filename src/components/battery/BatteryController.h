@@ -39,7 +39,7 @@ namespace Watch {
         void Init();
         void Update();
         float PercentRemaining() const { return percentRemaining;}
-        bool IsCharging();
+        bool IsCharging() { return isCharging; }
         bool IsPowerPresent() { return isPowerPresent; }       
         void setButtonData( uint8_t data);
         void setButtonDataNoVibrate( uint8_t data);
@@ -106,16 +106,16 @@ namespace Watch {
         bool getIslowbattery(){return islowbattery;}
         bool getDisturnOff(){return isDisturnOff;}
         void StopVibrate(void);
-        void setxyz( int8_t _x,int8_t _y,int8_t _z);
-        void setXmax(int8_t x);
-        void setYmax(int8_t y);
-        void setZmax(int8_t z);
-        int8_t getx() { return x;};
-        int8_t gety() { return y;};
-        int8_t getz() { return z;};
-        int8_t getxmax() { return xmax;};
-        int8_t getymax() { return ymax;};
-        int8_t getzmax() { return zmax;};
+        void setxyz( float _x,float _y,float _z);
+        void setXmax(float x);
+        void setYmax(float y);
+        void setZmax(float z);
+        float getx() { return x;};
+        float gety() { return y;};
+        float getz() { return z;};
+        float getxmax() { return xmax;};
+        float getymax() { return ymax;};
+        float getzmax() { return zmax;};
 
 
 
@@ -123,19 +123,20 @@ namespace Watch {
         static Battery *instance;
         nrf_saadc_value_t  saadc_value;
         uint8_t chargingPin = 19;
-        //uint8_t powerPresentPin = 20;
+        uint8_t powerPresentPin = 20;
         static constexpr nrf_saadc_input_t batteryVoltageAdcInput = NRF_SAADC_INPUT_AIN4;
         void SaadcInit();
 
         void SaadcEventHandler(nrfx_saadc_evt_t const * p_event);
         static void adcCallbackStatic(nrfx_saadc_evt_t const *event);
         
-        static constexpr uint8_t percentRemainingSamples = 5;
+        static constexpr uint8_t percentRemainingSamples = 20;
         CircBuffer<percentRemainingSamples> percentRemainingBuffer {};
 
         bool isReading = false;
         uint8_t samples = 0;
-        float percentRemaining = 0.0f;
+        float percentRemainingRead = 0.0f;
+        int percentRemaining = 0;
         float voltage = 0.0f;
         bool isCharging = false;
         bool isPowerPresent = false;
@@ -143,7 +144,7 @@ namespace Watch {
         bool isVibrate = false;
         uint8_t buttonData = 0x02;
         uint8_t impactzz =0x25;
-        uint8_t impactyy=0x02;
+        uint8_t impactyy=0x01;
         uint8_t checkinzz=0x00;
         uint8_t checkinyy=0x00;
         uint8_t fallHighpeak=0x35;
@@ -160,7 +161,6 @@ namespace Watch {
         bool isTimer2Display = false;
         bool GoToSleep= true;
         uint8_t isAlert =0x00;        
-        float AccData=0.0f;
         uint8_t currentHour = 0;
         uint8_t currentMinute = 0;
         uint8_t currentSecond = 0;
@@ -175,12 +175,13 @@ namespace Watch {
         bool checkVibrate= true;
         bool isButtonPushed = false;
         bool isDisturnOff = false; 
-        int8_t x =0;
-        int8_t y=0;
-        int8_t z=0;
-        int8_t xmax =0;
-        int8_t ymax=0;
-        int8_t zmax=0;
+        float AccData=0.0f;
+        float x =0.0f;
+        float y=0.0f;
+        float z=0.0f;
+        float xmax =0.0f;
+        float ymax=0.0f;
+        float zmax=0.0f;
        
     };
   }

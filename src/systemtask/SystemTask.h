@@ -96,7 +96,7 @@ namespace Watch {
         static constexpr uint8_t pinSpiAccCsn = 8;
         static constexpr uint8_t pinButton = 27;
         static constexpr uint8_t pinTouchIrq = 25; 
-        static constexpr uint8_t pinPowerPresentIrq = 20; 
+        //static constexpr uint8_t pinPowerPresentIrq = 20; 
 
 
         static void Process(void* instance);
@@ -111,7 +111,7 @@ namespace Watch {
         uint8_t FallDiscoveryTimer = 0;
         bool isImpactDiscoveryTimerRunning = false;
 
-        uint8_t ble_notifyTimer =2;
+        uint8_t battery_notifyTimer =4;
         TimerHandle_t idleTimer;
         TimerHandle_t idleTimerAcc;
         TimerHandle_t idleTimerCommon;
@@ -123,7 +123,7 @@ namespace Watch {
         uint8_t Touch=0;
         bool checkcharging = false;
         bool precheckcharging = false;
-        bool checklowbattery = false;
+        bool checklowbattery = true;
       
         bool checkbright= false;
         uint8_t BrightDiscoveryTimer = 0;
@@ -134,7 +134,6 @@ namespace Watch {
         bool checkheartbeat = true;
         uint8_t checktimeheart=0;
         uint8_t checknumheart =0;
-        float accValue=0;
         //bool runACC = true;
      
 /*

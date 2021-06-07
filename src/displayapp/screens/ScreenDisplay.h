@@ -71,27 +71,30 @@ namespace Watch {
           lv_obj_t* lablepercent;
           lv_obj_t* lableftemp;
           lv_obj_t* lablectemp;
+          lv_obj_t* tempChar;
+          lv_obj_t* tempWire;
+          /*  
           lv_obj_t* lableleftCircle;
           lv_obj_t* labletopCircle;
           lv_obj_t* lablerightCircle;
+          
           lv_obj_t* lableleftCircleSmall;
           lv_obj_t* labletopCircleSmall;
           lv_obj_t* lablerightCircleSmall;
           lv_obj_t* lablebottomCircleSmall;
-         /* lv_obj_t* Xmax; 
+         */
+          lv_obj_t* Xmax; 
           lv_obj_t* Ymax;
           lv_obj_t* Zmax;
           lv_obj_t* x;
           lv_obj_t* y;
           lv_obj_t* z;
           lv_obj_t* gwatch;
-          */
           lv_obj_t* textline1;
           lv_obj_t* textline2;
           lv_obj_t * label;
-          lv_obj_t * imgbtn1;
-
-          
+          lv_obj_t * arc;
+         
             
           Controllers::DateTime& dateTimeController;
           Controllers::Battery& batteryController;
